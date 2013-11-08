@@ -1,0 +1,30 @@
+{
+  "name": "CotizacionEspirituosa",
+  "version": "0.0.1-3",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "3.4.4",
+    "jade": "*",
+    "sqlite3": "~2.1.19"
+  },
+  "description": "Cotización de bebidas alcoholicas en un bar atendiendo al consumo de una noche.",
+  "main": "app.js",
+  "author": {
+    "name": "Jose Angel Navarro Martinez",
+    "email": "janmbaco@gmail.com"
+  },
+  "license": "BSD-2-Clause",
+  "keywords": [
+    ""
+  ],
+  "bugs": {
+    "web": "null"
+  },
+  "subdomain": "cotizacionespirituosa",
+  "engines": {
+    "node": "0.10.x"
+  }
+}

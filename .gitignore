@@ -1,0 +1,12 @@
+$ cat .gitignore
+
+# Podemos especificar archivos individuales
+./.nbrum
+
+# O usar comodines
+*~
+*.swp
+
+# También es posible ignorar todos los subdirectorios y archivos en un directorio determinado
+node_modules/**/**/**/*
+lib_dev/**/*

@@ -1,0 +1,213 @@
+﻿<!DOCTYPE html>
+<html lang="es-Es">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Cotizaci&oacute;n Espirituosa</title>
+
+        <link href="../css/bootstrap.css" rel="stylesheet" media="screen">
+        <link href="../css/bootstrap-responsive.css" rel="stylesheet">
+        <link href="../css/cotizacion_espirituosa.css" rel="stylesheet" media="screen">
+        <script src="../js/jquery.js" type="text/javascript"></script>
+        <script src="./js/main.js" type="text/javascript" charset="utf-8"></script>
+    </head>
+    <body style="" >
+        <div class='page-header' style=" background-color: #0088cc; min-height: 105px; background-image: url('../img/an.png');  background-position: 50px; background-repeat: no-repeat;padding:0px  ;padding-bottom: 20px; ;margin:0;">
+           
+        </div>
+        <div class="container row-fluid" style='margin-top: 10px;'>
+            <div id="Menu" class="span2">
+                <ul class="nav nav-list">
+                    <li  class="menu configuración active "><a id="Menu_panelPrincipal" href="javascript:void(0)" onClick="panelPrincipal()" class="pantalla" ><i class="icon-pencil" ></i> Configuraci&oacute;n</a></li>
+                    <li   class="menu configuración" ><a id="Menu_GestionarStock" href="javascript:void(0)" onClick="GestionarStock()" class="pantalla"><i class="icon-tasks"></i> Gestionar Stock</a></li>
+                    <li class="menu configuración"><a  id="Menu_IniciarSesiónCotización" href="javascript:void(0)" onClick="MostrarPanelSesiónCotización()" class="pantalla"><i class="icon-play"></i>Sesión de Cotización</a></li>
+                    <li id="Id_TiempoSesión" class="menu sesión  ">
+                        <a>
+                            Tiempo Sesión <span id="id_Caja_Tiempo"><span id="id_horas">00</span>:<span id="id_minutos">00</span>:<span id="id_segundos">00</span></span>
+                        </a>
+                    </li>
+                    <li  class="menu sesión " id="Id_PausarTemporizador">
+                        <a  href="javascript:void(0)" onclick="PausarTemporizador();" ><i class="icon-pause"> </i> Pausar temporizador</a>
+                    </li>
+                    <li  class="menu sesión" id="Id_ReanudarTemporizador">
+                        <a  href="javascript:void(0)" onclick="ReanudarTemporizador();" ><i class="icon-play"> </i> Reanudar temporizador</a>
+                    </li>
+                    <li   class="menu sesión" >
+                        <a  href="javascript:void(0)" onclick="CerrarSesión();"  ><i class="icon-stop"> </i> Cerrar sesión</a>
+                    </li>   
+                    <!--
+                    <li class="menu sesión">
+                        <a href="javascript:void(0)" onclick="ModificarStockSesión();"  ><i class="icon-tasks"> </i>Modificar Stock</a>
+                    </li>
+                    <li class="menu sesión">
+                        <a href="javascript:void(0)" onclick="ModificarGruposSesión();"><i class="icon-edit"> </i>Modificar Grupos</a>
+                    </li>
+                    <li class="menu sesión">
+                        <a href="javascript:void(0)" onclick="ModificarPreciosSesión();"><i class="icon-glass"> </i>Modificar Precios</a>
+                    </li>
+                    -->
+                    <li class="menu sesión">
+                        <a href="../visor/" target="_blank" ><i class="icon-road"> </i>Visor Cotización</a>
+                    </li>
+                </ul>
+            </div>
+            <div id="PanelPrincipal" class=" span10 tabbable panel" style="display: none;" >
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#tabPropiedades" data-toggle="tab" class="pantalla" id="id_TabPropiedades">Propiedades</a></li>
+                    <li ><a href="#tabTiposServicio" data-toggle="tab" id="id_tabTiposServicio" class="pantalla">Tipos de Servicio</a></li>
+                    <li ><a href="#tabGruposBebida" data-toggle="tab" class="pantalla" id="id_TabGruposBebida">Bebidas</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tabPropiedades">
+                        <table class="mitabla" >
+                            <caption>Propiedades por defecto</caption>
+                            <tbody>
+                                <tr>
+                                    <td  >
+                                        <label  for="Id_Servidor">Servidor PHP</label>
+                                    </td>
+                                    <td  colspan="3">
+                                        <input type="text" name="Id_Servidor" id="Id_Servidor" class=" input-xlarge" value="" />
+                                    </td>
+                                </tr>
+                            <td>
+                                <label  for="Id_Precio">Precio</label>
+                            </td>
+                            <td>
+                                <input type="number" min="0" step="0.10" name="Id_Precio" id="Id_Precio" class="tabla_Propiedades  input-mini numerico" value="" />
+                            </td>
+                            <td>
+                                <label for="Id_Maximo">Maximo</label>
+                            </td>
+                            <td>
+                                <input type="number" min="0" step="0.1" name="Id_Maximo" id="Id_Maximo" class="tabla_Propiedades input-mini numerico" value="" />
+                            </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label  for="Id_Minimo">Minimo</label>
+                                </td>
+                                <td>
+                                    <input type="number" min="0" step="0.10" name="Id_Minimo" id="Id_Minimo" class="tabla_Propiedades input-mini numerico" value="" />
+                                </td>
+                                <td>
+                                    <label for="Id_Tramo">Tramo</label>
+                                </td>
+                                <td>
+                                    <input type="number" min="0" step="0.10" name="Id_Tramo" id="Id_Tramo" class="tabla_Propiedades input-mini numerico" value="" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="Id_Cantidad_Botella">ml en cada botella</label>
+                                </td>
+                                <td>
+                                    <input type="number" min="0" step="50" name="Id_Cantidad_Botella" id="Id_Cantidad_Botella" class="tabla_Propiedades input-mini numerico" value="" /> 
+                                </td>
+                                <td>
+                                    <label for="Id_Cantidad_Stock">Botellas por marca</label>
+                                </td>
+                                <td>
+                                    <input type="number" min="0" step="1" name="Id_Cantidad_Stock" id="Id_Cantidad_Stock" class="tabla_Propiedades input-mini numerico" value="" /> 
+                                </td>
+                            </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td  colspan="4">
+                                        <a class="btn" id="ActualizarPreferencias" href="javascript:void(0);"><i class="icon-refresh"></i> Actualizar</a>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="tab-pane" id="tabTiposServicio">
+                        <table class="mitabla"  >
+                            <caption>Tipos de servicios</caption>
+                            <thead>
+                            <th>Nombre</th>
+                            <th>Cantidad</th>
+                            <th>Color</th>
+                            </thead>
+                            <tbody id="tabla_Tipos_Servicio">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane" id="tabGruposBebida">
+                        <table class="mitabla" >
+                            <caption>Grupos de Bebidas</caption>
+                            <thead>
+                            <th>Orden</th>
+                            <th >Nombre</th>
+                            <th>¿Genérico?</th>
+                            <th>Color</th>
+                            </thead>
+                            <tbody id="tabla_Grupos_Bebida">
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+            <div id="PanelGestionarStock" class = "panel span10" style="display: none;"   >
+                <table id='Id_Tabla_Bebidas' class="tabla_Grupo_Bebidas">	
+                    <caption > <input type='text' id='filtro' class='input-block-level' placeholder='Filtro: Introduzca nombre de bebida o grupo' onKeyup='Buscar()'/></caption>
+                    <thead>
+                        <tr>
+                            <th>Bebida</th>
+                            <th>Grupo</th> 
+                            <th>ml/Botella</th>
+                            <th>Cantidad/Botellas</th> 
+                            <th>Cantidad/Retales</th> 
+                            <th>Total(ml)</th> 
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="6" id="tr_cargando"  >
+                                <div class="progress progress-striped active" style="margin-top: 20px; text-align: center;">
+                                    <div class="bar" id="bar_Cargando" style="width: 0%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="PanelIniciarSesiónCotización" class="panel span10" style="display: none;"  >
+                <table id="Id_Tabla_Sel_Grupo_Bebidas" class="tabla_Grupo_Bebidas">
+                    <caption>Seleccione Grupos de Bebida para iniciar la cotización</caption>
+                    <tbody id="tbody_Sel_Grupos_Bebida">
+                        <tr>
+                            <td><label class="checkbox"  ><input type="checkbox" id="Id_Sel_GB_Todos" value="-2" checked="checked" class="sel_grupo_bebidas_checkbox" />Todos</label></td>
+                        </tr>
+                        <tr>
+                            <td><label class="checkbox"  ><input type="checkbox" id="Id_Sel_GB_Genericos" value="-1" class="sel_grupo_bebidas_checkbox" />Sólo Genéricos</label></td>
+                        </tr>
+                    </tbody>
+                    <tfoot><tr  ><td > <a class="btn" href="javascript:void(0)" onclick="IniciarSesiónCotización()"><i class="icon-play-circle"> </i> Iniciar Sesión de Cotización</a></td></tr></tfoot>
+                </table>
+            </div>
+            <div  id="PanelSesiónCotización" class="panel span10" style="display: none;"  ></div>
+            <div id="Id_Modal_Resumen_Servicios" class="modal hide">
+                <div class="modal-header"><h3> Resumen de servicio</h3></div>
+                <div class="modal-body">
+                    <table id="Id_Tabla_Resumen_Servicio">
+                        <tbody></tbody>
+                        <tfoot>
+                            <tr>
+                                <td  colspan="2">Total</td>
+                                <td  id="Id_TotalServicio"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <a href="javascript:void(0)" class="btn btn-info btn-large" onclick="$('#Id_Modal_Resumen_Servicios').modal('hide')">Continuar</a>
+                    <a href="javascript:void(0)"  class="btn btn-success btn-large" onclick="FinalizarServicio()">Finalizar Servicio</a>
+                </div>
+            </div>
+        </div>
+        <div  class="navbar navbar-fixed-bottom">
+            <div ><a href="mailto:janmbaco@gmail.com" >Jos&eacute; &Aacute;ngel Navarro</a></div>
+        </div>
+    </body>
+</html>

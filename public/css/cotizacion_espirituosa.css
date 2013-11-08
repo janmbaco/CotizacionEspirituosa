@@ -1,0 +1,246 @@
+/*
+        Nuevo css
+        
+*/
+*{
+     -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: default;
+}
+body{
+    //background-color: rgb(18,30,49);
+    //color: #fff !important;
+}
+input{
+         -webkit-user-select: auto;
+    -khtml-user-select: auto;
+    -moz-user-select: auto;
+    -o-user-select: auto;
+    -ms-user-select: auto;
+    user-select: auto;
+}
+.mitabla {
+
+    /*padding: 2px;*/
+    line-height: 10px;
+    text-align: left;
+    vertical-align: middle;
+    //min-width: 710px;
+}
+.mitabla caption, 
+#Id_Tabla_Sel_Grupo_Bebidas caption{
+    text-align:left;
+    font-size: 14pt;
+    padding: 10px;
+    border-bottom: 1px solid #dddddd;
+    margin: 10px;
+}
+
+.mitabla td {
+    padding: 5px;
+    padding-bottom:0px;
+    border-bottom: 1px solid #dddddd;
+
+}
+.mitabla .boton{
+    vertical-align: top;
+    padding-top: 4px;
+}
+
+.mitabla thead{
+    text-align: center;
+}
+.mitabla tfoot{
+    text-align: right;
+}
+.mitabla tfoot td{
+    border: 0;
+}
+.tabla_bebidas{
+    line-height: 20px;
+    text-align: left;
+    vertical-align: middle;
+    min-width: 710px;
+    /*	border: 1pt solid #dddddd;*/
+}
+
+.tabla_bebidas td{
+    padding: 5px;
+    /*	border: 1pt solid #dddddd;*/
+}
+
+.in_tabla{
+    line-height: 10px;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 10pt;
+    border: 1px solid #dddddd;
+    border-top:0;
+    margin:0;
+    padding: 2px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+
+}
+.in_tabla caption{
+    font-size: 12pt;
+    cursor:pointer;
+    cursor:hand;
+    border: 1px solid #dddddd;
+    border-bottom:0;
+    -webkit-border-top-left-radius: 4px;
+    -webkit-border-top-right-radius: 4px;
+    -moz-border-radius-topleft: 4px;
+    -moz-border-radius-topright: 4px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    margin: 0px;
+    padding: 20px;
+
+
+}
+
+.tabla_Grupo_Bebidas {
+    line-height: 20pt;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    min-width: 845px;
+}
+
+.tabla_Grupo_Bebidas td{
+    width: 100px;
+    border: 1px solid #dddddd;
+    padding: 5px;
+    padding-left: 35px;
+
+}
+
+.tabla_Grupo_Bebidas th{
+    width: 100px;
+}
+.cuadro_retales{
+    text-align: left;
+}
+
+.tabla_Grupo_Bebidas tbody > tr:nth-child(odd) > td,
+.tabla_Grupo_Bebidas tbody > tr:nth-child(odd) > th {
+    background-color: /*rgb(51,51,55);//*/#f9f9f9;
+}
+
+.tabla_Grupo_Bebidas tbody > tr:nth-child(even) > td,
+.tabla_Grupo_Bebidas tbody > tr:nth-child(even) > th {
+    //background-color: #444;//#f9f9f9;
+}
+
+.tabla_Grupo_Bebidas tbody tr:hover > td,
+.tabla_Grupo_Bebidas tbody tr:hover > th {
+    background-color: /*#4a4a4a;//*/#eaeaea;
+}
+.tabla_Grupo_Bebidas .numerico{
+    padding-left: 5px;
+    width: 60px;
+}
+
+.tabla_Grupo_Bebidas tbody tr:last-child td:first-child {
+
+    -webkit-border-bottom-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    -moz-border-radius-bottomleft: 4px;
+}
+
+.tabla_Grupo_Bebidas tbody tr:last-child td:last-child{
+    -webkit-border-bottom-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    -moz-border-radius-bottomright: 4px;
+}
+
+.numerico{
+    text-align: right !important;
+}
+
+h1{
+    text-align: center;
+}
+.tab-pane{
+    min-height: 425px;}
+
+.menu {
+    line-height: 40px;
+    display: none;
+}
+
+.bebidas{
+    width: 120px;
+    height: 120px; 
+    padding: 0px;
+    margin: 5px;
+    text-align: center;
+}
+.bebidas div{
+    width: 110px;
+    height: 110px;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    font-size: 14pt; 
+    font-weight: bold;
+    padding: 5px;
+}
+
+#id_Caja_Tiempo{
+    border: 1px solid #999ddd;
+    margin: 2px;
+    padding: 2px;
+}
+#Id_Tabla_Sel_Grupo_Bebidas
+{
+    
+    min-width: 525px;
+    width: 525px;
+}
+
+#Id_Tabla_Sel_Grupo_Bebidas td label{
+    
+    font-size: 12pt;
+    
+}
+
+#Id_Tabla_Sel_Grupo_Bebidas > tfoot td{
+    border: 0;
+    text-align: right;
+}
+
+#Id_Tabla_Resumen_Servicio {
+    width: 100%;
+    min-width: 400px;
+ 
+}
+#Id_Tabla_Resumen_Servicio tbody tr:nth-child(odd){
+    background-color:  #f9f9f9;
+}
+#Id_Tabla_Resumen_Servicio tbody tr:hover > td{
+    background-color: #eaeaea;
+}
+#Id_Tabla_Resumen_Servicio tbody tr:last-child{
+    border-bottom: 1px solid #dedede;
+    
+}
+#Id_Tabla_Resumen_Servicio tbody td{
+    font-size: 12pt;
+    line-height: 20pt;
+}
+
+#Id_Tabla_Resumen_Servicio tfoot td{
+    line-height: 40pt;
+    font-weight: bolder;
+    font-size: 14pt;
+}
