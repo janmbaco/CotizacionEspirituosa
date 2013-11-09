@@ -1,11 +1,8 @@
 Introdución
 ===========
->Cotización Espìrituosa es una aplicación ideada para la animación y espectáculo de bares, pubs, 
-discotecas o cualquier recinto donde haya consumo de bebidas. 
+>Cotización Espìrituosa es una aplicación ideada para la animación y espectáculo de bares, pubs, discotecas o cualquier recinto donde haya consumo de bebidas. 
 >
->Su principal cometido es animar al consumo de aquellos productos que por norma general tienen mas 
-stockaje. Para ello, en cada sesión se irán subiendo y bajando los precios de las bebidas a tenor de su 
-consumo.
+>Su principal cometido es animar al consumo de aquellos productos que por norma general tienen mas stockaje. Para ello, en cada sesión se irán subiendo y bajando los precios de las bebidas a tenor de su consumo.
 >
 >Esta herramienta consta de dos partes:
 >
