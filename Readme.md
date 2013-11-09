@@ -8,3 +8,5 @@ Introdución
 >
 >1. Parte tpv, donde ingresar las bebidas que van a cotizar.
 >2. Parte visor, donde se muestra el consumo de bebidas y el coste actual de cada bebida. 
+>
+> Realizado por Jose Angel Navarro Martínez
