@@ -1,0 +1,31 @@
+
+body{
+    background-color: #000;
+    
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25); background-repeat: repeat-x; border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    color: #cccccc;
+    padding: 5px;
+    font-size: x-large;
+}
+
+#Id_Cap_Mitos{
+    background-image: url("../images/logo.png");
+    background-repeat: no-repeat;
+    background-position-y: -5px;
+    background-position-x: 15px;
+    height: 100px;
+    padding: 0px;
+    text-align: center;
+    vertical-align: bottom;
+}
+
+#Id_Corp_Mitos table{
+    border: 1px solid #e0e0e0;
+}
+
+#Id_Corp_Mitos table caption{
+    font-size: xx-large ;
+    font-weight: bold;
+    text-align: left;
+    padding: 5px;
+}

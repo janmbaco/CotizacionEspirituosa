@@ -30,13 +30,12 @@ var ArrayTiposServicio = [];
 var ArrayBebidas = [];
 //el objeto del servicio en si
 var ArrDatosServicioActual = [];
-//
-//var ArrServicios = [] //para los servicios en curso
+
+var SesiónIniciada = false;
 
 
 
 var intervalo = null;
-var bPausadoTemporizador = false;
 var TimeOutFinalizarServicios;
 
 //Eventos al cargar la página
@@ -48,7 +47,16 @@ $("document").ready(function() {
             window.alert(resultados);
             return;
         }
+        SesiónIniciada = bSesiónIniciada;
         if (bSesiónIniciada) {
+
+            //vamos a comprobar si está listo este tpv
+            if (isUndefined(localStorage[TPV])) {
+                //mostrar la página para introducir un nombre del TPV
+                $(".configuración").hide();
+                MostrarPanelSesiónCotización();
+                return;
+            }
             //muestro los menus de sesion
             $(".sesión").show();
             $("#Id_TiempoSesión").addClass('active');
@@ -74,7 +82,8 @@ $("document").ready(function() {
                 }
             }
             AbrirSesiónCotizacion();
-        } else {
+        } 
+        else {
             $(".sesión").hide();
             $(".configuración").show();
             MostrarOpcionesxDefecto();
@@ -1085,8 +1094,22 @@ function EliminarRetales(idBebida) {
 function MostrarPanelSesiónCotización() {
     $(".menu").removeClass("active");
     $(".panel").hide();
-    $("#PanelIniciarSesiónCotización").show();
     $("#Menu_IniciarSesiónCotización").parent().addClass("active");
+    if (isUndefined(localStorage[TPV])) {
+        //se ha introducido algo como texto en el campo del nombre
+        if ($("#Id_Int_TPV").val() == "") {
+            //mostramos el panel para introducir el nombre del TPV
+            $("#PanelPeguntarNombreTPV").show();
+            return;
+        } else {
+            localStorage[TPV] = $("#Id_Int_TPV").val();
+        }
+        if (SesiónIniciada) {
+            AbrirSesiónCotizacion();
+            return;
+        }
+    }
+    $("#PanelIniciarSesiónCotización").show();
     //añadir los grupos de bebida
     RellenarCheckGruposBebida();
 }
@@ -1100,7 +1123,7 @@ function RellenarCheckGruposBebida() {
                 var html = "";
                 for (var i = 0; i < ArrayGruposBebida.length; i++)
                     html += "<tr class='fila_GB'><td>\n\
-                                    <label class='checkbox'><input type='checkbox' value='" + ArrayGruposBebida[i].IdGrupoBebida + "' class='sel_grupo_bebidas_checkbox'/>" + ArrayGruposBebida[i].Nombre + "</lable>\n\
+                                    <label class='checkbox'><input id='Id_Check_" + i + "' onchange='cambiarCheck(" + i + ")' type='checkbox' value='" + ArrayGruposBebida[i].IdGrupoBebida + "' class='sel_grupo_bebidas_checkbox check_grupos'/>" + ArrayGruposBebida[i].Nombre + "</lable>\n\
                                 </td></tr>";
 
                 return html;
@@ -1117,6 +1140,33 @@ function RellenarCheckGruposBebida() {
                 ArrayGruposBebida = ArrayGBebida;
                 RellenarCheckGruposBebida();
             });
+    }
+}
+
+function cambiarCheck(id) {
+
+    var s_id;
+
+    if (typeof id === "string") {
+
+        s_id = id;
+
+    } else {
+        s_id = 'Id_Check_' + id;
+    }
+    
+    if ($("#"+s_id).is(":checked")) {
+        if (typeof id === "string"){
+            //deseleccionar todos los de la clase .sel_grupo_bebidas_checkbox
+            $(".check_grupos").prop("checked", false);
+            if(s_id == "Id_Sel_GB_Todos"){
+               $("#Id_Sel_GB_Genericos").prop("checked", false);
+            }else{
+                $("#Id_Sel_GB_Todos").prop("checked", false);
+            }
+        }
+        else
+            $(".check_generico").prop("checked", false);
     }
 }
 
@@ -1247,11 +1297,8 @@ function AbrirSesiónCotizacion() {
                             if (!resultado.Pausada) {
                                 $("#Id_ReanudarTemporizador").hide();
                                 intervalo = initTiempoSesión();
-
-                                bPausadoTemporizador = false;
                             } else {
                                 $("#Id_PausarTemporizador").hide();
-                                bPausadoTemporizador = true;
                             }
                         });
                 });
@@ -1314,7 +1361,7 @@ function AñadirServicio(IdBebida, IdTipoServicio) {
         oTipoServicio.bAcotizar = true;
         //añadir un nuevo objeto al arrDatosServicioActual
         var IdDatoServicio = ArrDatosServicioActual.length;
-        ArrDatosServicioActual[IdDatoServicio] = new servidor.servicios.CDatoServicio(oTipoServicio.IdTipoServicio, oTipoServicio.Nombre, oBebida.IdBebida, oBebida.Nombre, precio);
+        ArrDatosServicioActual[IdDatoServicio] = new servidor.servicios.CDatoServicio(IdDatoServicio, oTipoServicio.IdTipoServicio, oTipoServicio.Nombre, oBebida.IdBebida, oBebida.Nombre, precio);
 
         var fila, p = Left(p = (p = (precio === null ? oTipoServicio.PrecioInicial : precio).toString()) + (p.indexOf(".") === -1 ? '.' : '') + '00', p.split(".")[0].length + 3);
         //cerrar este cuadro modal y abrir otro con el resumen
@@ -1344,12 +1391,11 @@ function AñadirServicio(IdBebida, IdTipoServicio) {
     });
 }
 
-
 function DuplicarDatoServicio(index) {
     if (!isUndefined(TimeOutFinalizarServicios))
         clearTimeout(TimeOutFinalizarServicios);
     var IdDatoServicio = ArrDatosServicioActual.length;
-    ArrDatosServicioActual[IdDatoServicio] = ArrDatosServicioActual[index];
+    ArrDatosServicioActual[IdDatoServicio] = new servidor.servicios.CDatoServicio(IdDatoServicio, ArrDatosServicioActual[index].IdTipoServicio, ArrDatosServicioActual[index].NombreTipoServicio, ArrDatosServicioActual[index].IdBebida, ArrDatosServicioActual[index].NombreBebida, ArrDatosServicioActual[index].Precio);
 
     var fila, p = Left(p = (p = ArrDatosServicioActual[IdDatoServicio].Precio.toString()) + (p.indexOf(".") === -1 ? '.' : '') + '00', p.split(".")[0].length + 3);
     $('#Id_Modal_Resumen_Servicios .modal-body tbody').append(
@@ -1468,6 +1514,47 @@ function ReanudarTemporizador() {
 }
 
 function CerrarSesión() {
+    if (ArrDatosServicioActual.length > 0) {
+        servidor.servicios.AñadirServicio(ArrDatosServicioActual,
+            function(bExito, strMensaje) {
+                if (!bExito) {
+                    window.alert(strMensaje);
+                    return;
+                }
+                ArrDatosServicioActual = [];
+                //eliminar las tablas del servicio
+                $('#Id_Modal_Resumen_Servicios .modal-body tbody').html("");
+                //eliminar la cache del localstorage con respecto a este servicio
+                localStorage[ServiciosNoFinalizados] = 0;
+                $('#Id_Modal_Resumen_Servicios').modal('hide');
+                //vamos a cotizar todos aquellos tipos de servicio a cotizar
+                var ArrGruposBebidaACotizar = [];
+                for (var i = 0; i < ArrayBebidas.length; i++)
+                    for (var j = 0; j < ArrayBebidas[i].TiposServicio.length; j++)
+                        if (ArrayBebidas[i].TiposServicio[j].bAcotizar)
+                            ArrGruposBebidaACotizar[ArrGruposBebidaACotizar.length] = ArrayBebidas[i].IdGrupoBebida;
+
+                for (var i = 0; i < ArrGruposBebidaACotizar.length; i++)
+                    for (var j = 0; j < ArrayBebidas.length; j++)
+                        if (ArrayBebidas[j].IdGrupoBebida === ArrGruposBebidaACotizar[i])
+                            for (var k = 0; k < ArrayBebidas[j].TiposServicio.length; k++)
+                                ArrayBebidas[j].TiposServicio[k].Cotizar();
+                TerminarSesión();
+
+
+            });
+    } else {
+        //eliminar las tablas del servicio
+        $('#Id_Modal_Resumen_Servicios .modal-body tbody').html("");
+        //eliminar la cache del localstorage con respecto a este servicio
+        localStorage[ServiciosNoFinalizados] = 0;
+        $('#Id_Modal_Resumen_Servicios').modal('hide');
+        TerminarSesión();
+    }
+}
+
+function TerminarSesión() {
+
     servidor.cotización.CerrarSesión(function(bExito, strMensaje) {
         if (!bExito) {
             window.alert(strMensaje);

@@ -16,8 +16,6 @@
  */
 
 var servidor = (function() {
-
-
     var cmdAjax = function(paquete, funcion, param, EvResultado, self) {
         var url = (function() {
             if (!isUndefined(localStorage["servidor"])) {
@@ -154,7 +152,7 @@ var servidor = (function() {
                             EvResultado(false, "No existen esos datos en el servidor, es posible que se hayan eliminado ya");
                         return;
                     }
-                    cmdAjax("servicios.Servicio", "QuitarDatos", [this.IdSesion, this.IdServicio, [this.ArrDatosServicio[index]]],
+                    cmdAjax("servicios.Servicio", "QuitarDatos", [this.IdServicio, [this.ArrDatosServicio[index]]],
                         function(bExito, strMensaje) {
                             if (!bExito) {
                                 if (!isUndefined(EvResultado))
@@ -167,7 +165,7 @@ var servidor = (function() {
                         });
                 };
                 this.Quitar = function(EvResultado) {
-                    cmdAjax("servicios.Servicio", "Quitar", [this.IdSesion, this.IdServicio], EvResultado);
+                    cmdAjax("servicios.Servicio", "Quitar", [this.IdServicio], EvResultado);
                 };
 
             };
@@ -208,12 +206,14 @@ var servidor = (function() {
                 , AñadirServicio: function(ArrDatosServicio, EvResultado) {
                     cmdAjax("servicios.Servicio", "Añadir", [ArrDatosServicio], EvResultado);
                 }
-                , CDatoServicio: function(idTipoServicio, nombreTipoServicio, idBebida, nombreBebida, precio) {
+                , CDatoServicio: function(idOrden, idTipoServicio, nombreTipoServicio, idBebida, nombreBebida, precio) {
+                    this.IdOrden = idOrden;
                     this.IdTipoServicio = idTipoServicio;
                     this.IdBebida = idBebida;
                     this.Precio = precio;
                     this.NombreTipoServicio = nombreTipoServicio;
                     this.NombreBebida = nombreBebida;
+                    this.TPV = localStorage[TPV];
                     return this;
                 }
             };

@@ -3,18 +3,8 @@
  funciones globales para todo el programa
  
  */
-    var Grupos_Bebida = 0
-    , Bebidas = 1
-    , Tipos_Servicio = 2
-    , Sesiones = 3
-    , Grupos_Bebida_Sesiones = 4
-    , Bebidas_Sesiones = 5
-    , Servicios = 6
-    , Bebidas_Servicios = 7
-    , Precios = 8
-    , Cotización = 9
-    , Propiedades = 10
-    , ServiciosNoFinalizados = "ServiciosNoFinalizados";
+var ServiciosNoFinalizados = "ServiciosNoFinalizados";
+var TPV = "TPV";
 
 function isUndefined(obj) {
     return obj === void 0;
