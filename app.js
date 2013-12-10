@@ -69,6 +69,7 @@ app.get('/wsjson', function(req, res) {
         }
     }
     params += "EvResultado";
+    console.log(params);
     //en el req.query recibo un objeto que tiene como minimo paquete y funcion
     eval(paquete + "." + funcion + "(" + params + ");");
 

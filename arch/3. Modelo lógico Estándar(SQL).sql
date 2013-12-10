@@ -7,6 +7,9 @@ CREATE TABLE Propiedades
 CREATE TABLE Grupo_Bebidas (
 	Id_G_Bebida NUMERIC(3,0) PRIMARY KEY
 ,	Nombre VARCHAR(150) UNIQUE
+,   Tipos_Genericos NUMERIC(1,0) NULL
+,   Color NUMERIC(10,0) NULL
+,   Orden NUMERIC(3,0) NULL   
 );
 
 CREATE TABLE Bebidas (
@@ -23,29 +26,19 @@ CREATE TABLE Tipo_Servicios (
 	Id_T_Servicio NUMERIC(3,0) PRIMARY KEY
 ,	Nombre VARCHAR(150) UNIQUE
 ,	Cantidad NUMERIC(5,0) NOT NULL
-,	Combinado NUMERIC(1,0) NULL
+,	Color NUMERIC(10,0) NULL
 );
 
 CREATE TABLE Sesiones (
-	Id_Sesion NUMERIC(10,0) PRIMARY KEY
+	Id_Sesion NUMERIC(5,0) PRIMARY KEY
 ,	Inicio DATETIME NOT NULL
 ,	Fin	DATETIME NULL
 ,	Pausada NUMERIC(1,0) NULL
 , 	CHECK (Fin > Inicio)
 );
 
-CREATE TABLE Grupos_Bebida_Sesiones(
-	Id_Sesion NUMERIC(10,0) NOT NULL REFERENCES
-		Sesiones(Id_Sesion) ON DELETE CASCADE
-					    ON UPDATE CASCADE
-,	Id_G_Bebida NUMERIC(3,0) NOT NULL REFERENCES
-		Grupos_Bebida(Id_G_Bebida)	ON DELETE CASCADE
-						ON UPDATE CASCADE
-,	PRIMARY KEY (Id_Sesion, Id_G_Bebida)
-);
-
 CREATE TABLE Bebidas_Sesiones(
-	Id_Sesion NUMERIC(10,0) NOT NULL REFERENCES
+	Id_Sesion NUMERIC(5,0) NOT NULL REFERENCES
 		Sesiones(Id_Sesion) ON DELETE CASCADE
 					    ON UPDATE CASCADE
 ,	Id_Bebida NUMERIC(5,0) NOT NULL REFERENCES
@@ -56,27 +49,27 @@ CREATE TABLE Bebidas_Sesiones(
 );
 
 CREATE TABLE Servicios (
-	Id_Sesion	NUMERIC(10,0) NOT NULL REFERENCES
+	Id_Sesion	NUMERIC(5,0) NOT NULL REFERENCES
 		Sesiones(Id_Sesion) ON DELETE CASCADE 
 					    ON UPDATE CASCADE
-,	Id_Servicio NUMERIC(5,0) NOT NULL
-,	Id_T_Servicio NUMERIC(3,0) NOT NULL REFERENCES 
-		Tipo_Servicios (Id_T_Servicio) ON DELETE CASCADE
-							    ON UPDATE CASCADE
+,	Id_Servicio NUMERIC(5,0) NOT NULL PRIMARY KEY
 , 	Fecha DATETIME NOT NULL
-,	PRIMARY KEY (Id_Sesion, Id_Servicio)
+,   TPV VARCHAR(20) NOT NULL
 );
 
-CREATE TABLE Bebidas_Servicios (
-	Id_Sesion	NUMERIC(10, 0) NOT NULL 
-,	Id_Servicio NUMERIC(15,0) NOT NULL 
-,	Id_Bebida NUMERIC(5,0) NOT NULL REFERENCES
-		Bebidas(Id_Bebida) ON DELETE CASCADE
-					   ON UPDATE CASCADE
-, 	PRIMARY KEY (Id_Sesion, Id_Servicio, Id_Bebida)
-, 	FOREIGN KEY (Id_Sesion, Id_Servicio) REFERENCES Servicios(Id_Sesion, Id_Servicio) 
-					ON DELETE CASCADE
-					ON UPDATE CASCADE
+CREATE TABLE Ordenes (
+    Id_Servicio NUMERIC(5,0) NOT NULL REFERENCES 
+        Servicios(Id_Servicio) ON DELETE CASCADE
+                                ON UPDATE CASCADE
+,   Id_Orden NUMERIC(2,0) NOT NULL 
+,   Id_T_Servicio NUMERIC(3,0) NOT NULL REFERENCES
+        Tipos_Servicio(Id_T_Servicio) ON DELETE CASCADE
+                                        ON UPDATE CASCADE
+,   Id_Bebida NUMERIC(5,0) NOT NULL REFERENCES
+        Bebidas(Id_Bebida) ON DELETE CASCADE
+                            ON UPDATE CASCADE
+,   Precio NUMERIC(5,2) NOT NULL
+,   PRIMARY KEY (Id_Servicio, Id_Orden, Id_T_Servicio, Id_Bebida)
 );
 
 CREATE TABLE Precios (
