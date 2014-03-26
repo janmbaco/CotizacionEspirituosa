@@ -18,9 +18,9 @@
     "use strict";
 //Incluir los javascripts de los que dependo
 document.write(
-    '<script src="../js/global.js" type="text/javascript"></script>' +
-    '<script src="../js/bootstrap.js" type="text/javascript"></script>' +
-    '<script src="../js/servidor.js" type="text/javascript" charset="utf-8"></script>');
+    '<script src="./js/global.js" type="text/javascript"></script>' +
+    '<script src="./js/bootstrap.js" type="text/javascript"></script>' +
+    '<script src="./js/servidor.js" type="text/javascript" charset="utf-8"></script>');
 
 //Lista de Grupos de bebida
 var ArrayGruposBebida = [];
@@ -30,6 +30,8 @@ var ArrayTiposServicio = [];
 var ArrayBebidas = [];
 //el objeto del servicio en si
 var ArrDatosServicioActual = [];
+//Tengo que contabilizar el stock
+var bStock = false;
 
 var SesiónIniciada = false;
 
@@ -82,7 +84,7 @@ $("document").ready(function() {
                 }
             }
             AbrirSesiónCotizacion();
-        } 
+        }
         else {
             $(".sesión").hide();
             $(".configuración").show();
@@ -100,42 +102,6 @@ $("document").ready(function() {
     //al hacer click en una clase de pantalla
     $(".pantalla").click(function() {
         sessionStorage["estado"] = this.id;
-    });
-
-    //al hacer click en actualizapreferencias
-    $("#ActualizarPreferencias").click(function() {
-        //Tendré que ver si he modificado el servidor
-        if (!isUndefined(localStorage["servidor"])) {
-            if (localStorage["servidor"] !== $("#Id_Servidor").val()) {
-                localStorage["servidor"] = $("#Id_Servidor").val();
-                MostrarOpcionesxDefecto();
-                return;
-            }
-        }
-        //obtener los datos de la pantalla e insertarlos en la base de datos
-        var secuencia = -1;
-        var ArrUpdate = [];
-        $(".tabla_Propiedades").each(function(i)
-        {
-            ArrUpdate[i] = [$(this).attr('id').replace("Id_", ""), $(this).val()];
-        });
-        var UpdateRecursivo = function(bExito) {
-            if (!bExito) {
-                alert("No se ha podido actualizar,\npor favor, pruebe más tarde");
-                return;
-            }
-            secuencia++;
-            if (secuencia === ArrUpdate.length) {
-                MostrarOpcionesxDefecto();
-            } else {
-                servidor.propiedades.ModificarPropiedad(ArrUpdate[secuencia][0], ArrUpdate[secuencia][1]
-                    , function(bExito) {
-                        UpdateRecursivo(bExito);
-                    });
-            }
-        };
-        UpdateRecursivo(true);
-
     });
 
     $.extend($.expr[":"],
@@ -164,6 +130,27 @@ function MostrarOpcionesxDefecto() {
         });
 }
 
+function ModificarServidor() {
+    if (!isUndefined(localStorage["servidor"])) {
+        if (localStorage["servidor"] !== $("#Id_Servidor").val()) {
+            localStorage["servidor"] = $("#Id_Servidor").val();
+            MostrarOpcionesxDefecto();
+            return;
+        }
+    }
+}
+
+function ModificarPreferencias(id) {
+    servidor.propiedades.ModificarPropiedad(id.replace("#Id_", ""), $(id).val()
+        , function(bExito) {
+            if (!bExito) {
+                alert("No se ha podido actualizar,\npor favor, pruebe más tarde");
+                return;
+            }
+            MostrarOpcionesxDefecto();
+        });
+}
+
 ///////////////////////Tipos de Servicio///////////////////////////////////////
 function MostrarTiposServicio() {
     servidor.servicios.ListarTiposServicio(
@@ -178,10 +165,29 @@ function MostrarTiposServicio() {
             for (var i = 0; i < ArrayTiposServicio.length; i++) {
                 //vamos a rellenar la tabla de tipos de servicios
                 $("#tabla_Tipos_Servicio").append('<tr> ' +
-                    '<td><input type="text" id="Id_TS_' + ArrayTiposServicio[i].IdTipoServicio + '_Nombre" value="' + ArrayTiposServicio[i].Nombre + '"></td> ' +
-                    '<td><input type="number" min="0" step="1" id="Id_TS_' + ArrayTiposServicio[i].IdTipoServicio + '_Cantidad" value="' + null_o_str(ArrayTiposServicio[i].Cantidad) + '" class="input-mini numerico"></td> ' +
-                    '<td><input type="color" id="Id_TS_' + ArrayTiposServicio[i].IdTipoServicio + '_Color" value="' + ArrayTiposServicio[i].Color.ColorHash + '" class="input-mini" /></td>' +
-                    '<td class="boton" ><a class="btn" onClick="ModificarTipoServicio(' + i + ')"  href="javascript:void(0)"><i class="icon-refresh"></i> </a><a class="btn" onClick="EliminarTipoServicio(' + i + ')" href="javascript:void(0)"><i class="icon-minus"></i> </a></td> ' +
+                    '<td><span id="Id_TS_' + ArrayTiposServicio[i].IdTipoServicio + '_Nombre" class="uneditable-input" >' + ArrayTiposServicio[i].Nombre + '</span></td> ' +
+                    '<td><input type="number" min="0" step="1" id="Id_TS_' + ArrayTiposServicio[i].IdTipoServicio + '_Cantidad" value="' + null_o_str(ArrayTiposServicio[i].Cantidad) + '" class="input-mini numerico" onchange="ModificarTipoServicio(' + i + ')"></td> ' +
+                    '<td><input type="color" id="Id_TS_' + ArrayTiposServicio[i].IdTipoServicio + '_Color" value="' + ArrayTiposServicio[i].Color.ColorHash + '" class="input-mini" onchange="ModificarTipoServicio(' + i + ')" /></td>' +
+                    '<td class="boton" >\n\
+                        <!--<a class="btn" onClick="ModificarTipoServicio(' + i + ')"  href="javascript:void(0)"><i class="icon-refresh"></i> </a>-->\n\
+                        <a class="btn"   data-toggle="modal" data-target="#Id_TS_' + ArrayTiposServicio[i].IdTipoServicio + '_Eliminar_Modal" ><i class="icon-minus" ></i> </a>\n\
+                            <div id="Id_TS_' + ArrayTiposServicio[i].IdTipoServicio + '_Eliminar_Modal" class="modal hide " >\n\
+                                <div class="modal-header">\n\
+                                <h3>Eliminación del tipo de servicio <b>' + ArrayTiposServicio[i].Nombre + '</b></h3>\n\
+                                </div>\n\
+                                <div class="modal-body" style="text-align:left;">\n\
+                                    <p>\n\
+                                    ¿Está seguro que desea eliminar este Tipo de Servicio <b>' + ArrayTiposServicio[i].Nombre + '</b>? \n\
+                                    </p>\n\
+                                    <p>\n\
+                                     &nbsp; &nbsp;Tenga en cuenta que esta acción no se puede deshacer.\n\
+                                    </p>\n\
+                                </div>\n\
+                                <div class="modal-footer">\n\
+                                    <a href="javascript:void(0);" onClick="EliminarTipoServicio(' + i + ')"  data-dismiss="modal" >Eliminar</a> <a href="javascript:void(0)" data-dismiss="modal" aria-hidden="true" class="btn btn-success">Cancelar</a>\n\
+                                </div>\n\
+                            </div>\n\
+                    </td> ' +
                     '<td class="boton"><a class="btn" href="javascript:void()" onClick="MostrarPrecios(0,' + i + ')" style="font-weight: bold"><i class="icon-th-list"> </i> Precios </a> ' +
                     '   <div id="Id_TS_' + ArrayTiposServicio[i].IdTipoServicio + '_Precios" class="modal hide " style="min-width: 750px" >\n\
                             <div class="modal-header">\n\
@@ -241,7 +247,7 @@ function ModificarTipoServicio(index) {
         alert("indice fuera del rango");
         return;
     }
-    if ($("#Id_TS_" + ArrayTiposServicio[index].IdTipoServicio + "_Nombre").val() === "") {
+    if ($("#Id_TS_" + ArrayTiposServicio[index].IdTipoServicio + "_Nombre").html() === "") {
         alert("Debe indicar el nombre del tipo de servicio");
         return;
     }
@@ -252,7 +258,7 @@ function ModificarTipoServicio(index) {
 
     var color = new ColorUtils($("#Id_TS_" + ArrayTiposServicio[index].IdTipoServicio + "_Color").val());
 
-    servidor.servicios.ModificarTipoServicio(ArrayTiposServicio[index].IdTipoServicio, $("#Id_TS_" + ArrayTiposServicio[index].IdTipoServicio + "_Nombre").val(), $("#Id_TS_" + ArrayTiposServicio[index].IdTipoServicio + "_Cantidad").val(), color.Color
+    servidor.servicios.ModificarTipoServicio(ArrayTiposServicio[index].IdTipoServicio, $("#Id_TS_" + ArrayTiposServicio[index].IdTipoServicio + "_Nombre").html(), $("#Id_TS_" + ArrayTiposServicio[index].IdTipoServicio + "_Cantidad").val(), color.Color
         , function(bExito) {
             if (!bExito) {
                 alert("No se ha podido modificar el tipo de servicio");
@@ -339,14 +345,32 @@ function AñadirFilasTablaPrecios(n, index, self) {
                 var precio = self.Precios[i];
                 html +=
                     "<tr>\n\
-                                <td><select id='Id_" + (!n ? "TS_" + self.IdTipoServicio : "GB_" + self.IdGrupoBebida) + "_" + (!n ? precio.IdGrupoBebida : precio.IdTipoServicio) + "_Precio_" + (!n ? "GrupoBebida" : "TipoServicio") + "' class='" + (!n ? 'Select_Grupos_Bebida' : 'Select_Tipos_Servicio') + "' name='" + (!n ? precio.IdGrupoBebida : precio.IdTipoServicio) + "' /></td>\n\
-                                <td><input type='number'  id='Id_" + (!n ? "TS_" + self.IdTipoServicio : "GB_" + self.IdGrupoBebida) + "_" + (!n ? precio.IdGrupoBebida : precio.IdTipoServicio) + "_Precio_Precio' min='0' step='0.1' class='input-mini numerico' value='" + precio.Precio + "' /></td>\n\
-                                <td><input type='number' id='Id_" + (!n ? "TS_" + self.IdTipoServicio : "GB_" + self.IdGrupoBebida) + "_" + (!n ? precio.IdGrupoBebida : precio.IdTipoServicio) + "_Precio_Maximo' min='0' step='0.1' class='input-mini numerico' value='" + precio.Maximo + "'/></td>\n\
-                                <td><input type='number' id='Id_" + (!n ? "TS_" + self.IdTipoServicio : "GB_" + self.IdGrupoBebida) + "_" + (!n ? precio.IdGrupoBebida : precio.IdTipoServicio) + "_Precio_Minimo' min='0' step='0.1' class='input-mini numerico' value='" + precio.Minimo + "' /></td>\n\
-                                <td><input type='number' id='Id_" + (!n ? "TS_" + self.IdTipoServicio : "GB_" + self.IdGrupoBebida) + "_" + (!n ? precio.IdGrupoBebida : precio.IdTipoServicio) + "_Precio_Tramo' min='0' step='0.1' class='input-mini numerico' value='" + precio.Tramo + "'/></td>\n\
-                                <td class='boton'><a class='btn' href='javascript:void()' onclick='ModificarPrecio(" + n + "," + index + "," + i + ")' class='btn'><i class='icon-refresh'> </i></a>\n\
-                                                  <a class='btn' href='javascript:void()' onclick='EliminarPrecio(" + n + "," + index + "," + i + ")' class='btn'><i class='icon-minus'> </i></a>\n\
-                                </td>\n\
+                                <td><span id='Id_" + (!n ? "TS_" + self.IdTipoServicio : "GB_" + self.IdGrupoBebida) + "_" + (!n ? precio.IdGrupoBebida : precio.IdTipoServicio) + "_Precio_Nombre" + (!n ? "GrupoBebida" : "TipoServicio") + "' class='" + /*(!n ? 'Select_Grupos_Bebida' : 'Select_Tipos_Servicio') +*/ " uneditable-input'>" + (!n ? precio.NombreGrupoBebida : precio.NombreTipoServicio) + "</span/>\n\
+                                    <input type='hidden' id='Id_" + (!n ? "TS_" + self.IdTipoServicio : "GB_" + self.IdGrupoBebida) + "_" + (!n ? precio.IdGrupoBebida : precio.IdTipoServicio) + "_Precio_" + (!n ? "GrupoBebida" : "TipoServicio") + "' value='" + (!n ? precio.IdGrupoBebida : precio.IdTipoServicio) + "'/></td>\n\
+                                <td><input type='number'  id='Id_" + (!n ? "TS_" + self.IdTipoServicio : "GB_" + self.IdGrupoBebida) + "_" + (!n ? precio.IdGrupoBebida : precio.IdTipoServicio) + "_Precio_Precio' min='0' step='0.1' class='input-mini numerico' value='" + precio.Precio + "' onchange='ModificarPrecio(" + n + "," + index + "," + i + ")' /></td>\n\
+                                <td><input type='number' id='Id_" + (!n ? "TS_" + self.IdTipoServicio : "GB_" + self.IdGrupoBebida) + "_" + (!n ? precio.IdGrupoBebida : precio.IdTipoServicio) + "_Precio_Maximo' min='0' step='0.1' class='input-mini numerico' value='" + precio.Maximo + "' onchange='ModificarPrecio(" + n + "," + index + "," + i + ")' /></td>\n\
+                                <td><input type='number' id='Id_" + (!n ? "TS_" + self.IdTipoServicio : "GB_" + self.IdGrupoBebida) + "_" + (!n ? precio.IdGrupoBebida : precio.IdTipoServicio) + "_Precio_Minimo' min='0' step='0.1' class='input-mini numerico' value='" + precio.Minimo + "' onchange='ModificarPrecio(" + n + "," + index + "," + i + ")' /></td>\n\
+                                <td><input type='number' id='Id_" + (!n ? "TS_" + self.IdTipoServicio : "GB_" + self.IdGrupoBebida) + "_" + (!n ? precio.IdGrupoBebida : precio.IdTipoServicio) + "_Precio_Tramo' min='0' step='0.1' class='input-mini numerico' value='" + precio.Tramo + "' onchange='ModificarPrecio(" + n + "," + index + "," + i + ")'/></td>\n\
+                                <td class='boton'>\n\
+                                                <!--<a class='btn' href='javascript:void()' onclick='ModificarPrecio(" + n + "," + index + "," + i + ")' class='btn'><i class='icon-refresh'> </i></a>-->\n\
+                                                  <a class='btn' data-toggle='modal' data-target='#Id_" + (!n ? "TS_" + self.IdTipoServicio : "GB_" + self.IdGrupoBebida) + "_" + (!n ? precio.IdGrupoBebida : precio.IdTipoServicio) + "_Precio_Eliminar_Modal' class='btn'><i class='icon-minus'> </i></a>\n\
+                                                    <div id='Id_" + (!n ? "TS_" + self.IdTipoServicio : "GB_" + self.IdGrupoBebida) + "_" + (!n ? precio.IdGrupoBebida : precio.IdTipoServicio) + "_Precio_Eliminar_Modal'" + ' class="modal hide " >\n\
+                                                        <div class="modal-header">\n\
+                                                        <h3>Eliminación del Precio para <b>' + (!n ? precio.NombreGrupoBebida : precio.NombreTipoServicio) + '</b></h3>\n\
+                                                        </div>\n\
+                                                        <div class="modal-body" style="text-align:left;">\n\
+                                                            <p>\n\
+                                                            ¿Está seguro que desea eliminar el precio a <b>' + (!n ? precio.NombreGrupoBebida : precio.NombreTipoServicio) + '</b>? \n\
+                                                            </p>\n\
+                                                            <p>\n\
+                                                             &nbsp; &nbsp;Tenga en cuenta que esta acción no se puede deshacer.\n\
+                                                            </p>\n\
+                                                        </div>\n\
+                                                        <div class="modal-footer">\n\
+                                                            <a href="javascript:void(0);" onclick="EliminarPrecio(' + n + ',' + index + ',' + i + ')"  data-dismiss="modal" >Eliminar</a> <a href="javascript:void(0)" data-dismiss="modal" aria-hidden="true" class="btn btn-success">Cancelar</a>\n\
+                                                        </div>\n\
+                                                    </div>' +
+                    "</td>\n\
                             </tr>";
             }
             //añadir la última linea para poder añadir un precio
@@ -391,7 +415,7 @@ function AñadirPrecio(n, index) {
         return;
     }
     for (var i = 0; i < (!n ? ArrayTiposServicio[index].Precios.length : ArrayGruposBebida[index].Precios.length); i++) {
-        if ((!n ? ArrayTiposServicio[index].Precios[i].IdGrupoBebida : ArrayGruposBebida[index].Precios[i].IdGrupoBebida) == $(cap + (!n ? "GrupoBebida" : "TipoServicio")).val()) {
+        if ((!n ? ArrayTiposServicio[index].Precios[i].IdGrupoBebida : ArrayGruposBebida[index].Precios[i].IdTipoServicio) == $(cap + (!n ? "GrupoBebida" : "TipoServicio")).val()) {
             alert("El " + (!n ? "grupo de bebidas" : "tipo de servicio") + " que has seleccionado, ya tiene un precio asociado");
             return;
         }
@@ -579,17 +603,35 @@ function MostrarGruposBebida() {
                 Max = ArrayGruposBebida[i].Orden;
             $("#tabla_Grupos_Bebida").append(
                 '<tr > ' +
-                '	<td><input type="number" max="99" min="0" step="1" id="Id_GB_' + ArrayGruposBebida[i].IdGrupoBebida + '_Orden" value="' + ArrayGruposBebida[i].Orden + '" class="input-mini"></td>' +
-                '	<td><input type="text" id="Id_GB_' + ArrayGruposBebida[i].IdGrupoBebida + '_Nombre" value="' + ArrayGruposBebida[i].Nombre + '" class="input-block-level"></td>' +
+                '	<td><input type="number" max="99" min="0" step="1" id="Id_GB_' + ArrayGruposBebida[i].IdGrupoBebida + '_Orden" value="' + ArrayGruposBebida[i].Orden + '" class="input-mini " onchange="ModificarGrupoBebida(' + i + ')" ></td>' +
+                '	<td><span id="Id_GB_' + ArrayGruposBebida[i].IdGrupoBebida + '_Nombre" class="input-block-level uneditable-input">' + ArrayGruposBebida[i].Nombre + '</span></td>' +
                 '   <td>' +
-                '       <select id="Id_GB_' + ArrayGruposBebida[i].IdGrupoBebida + '_TipoGenerico" style="width:75px; text-align:center;"   >' +
+                '       <select id="Id_GB_' + ArrayGruposBebida[i].IdGrupoBebida + '_TipoGenerico" style="width:75px; text-align:center;" onchange="ModificarGrupoBebida(' + i + ')"  >' +
                 '           <option value="0" ' + (ArrayGruposBebida[i].bTiposGenericos ? '' : 'selected="selected"') + '>No</option>' +
                 '           <option value="1" ' + (ArrayGruposBebida[i].bTiposGenericos ? 'selected="selected"' : '') + '>Sí</option>' +
                 '       </select>' +
                 '   </td>' +
-                '   <td><input id="Id_GB_' + ArrayGruposBebida[i].IdGrupoBebida + '_Color" type="color" value="' + ArrayGruposBebida[i].Color.ColorHash + '" class="input-mini" /></td>' +
-                '	<td class="boton" ><a class="btn" onClick="ModificarGrupoBebida(' + i + ')"  href="javascript:void(0)"><i class="icon-refresh" ></i> </a><a class="btn" onClick="EliminarGrupoBebida(' + i + ')" href="javascript:void(0)"><i class="icon-minus"></i> </a></td>' +
-                '   <td class="boton" style="text-align:left;">' +
+                '   <td><input id="Id_GB_' + ArrayGruposBebida[i].IdGrupoBebida + '_Color" type="color" value="' + ArrayGruposBebida[i].Color.ColorHash + '" class="input-mini" onchange="ModificarGrupoBebida(' + i + ')" /></td>' +
+                '	<td class="boton" >\n\
+                        <!--<a class="btn" onClick="ModificarGrupoBebida(' + i + ')"  href="javascript:void(0)"><i class="icon-refresh" ></i> </a>-->\n\
+                        <a class="btn"  data-toggle="modal" data-target="#Id_GB_' + ArrayGruposBebida[i].IdGrupoBebida + '_Eliminar_Modal" ><i class="icon-minus"></i> </a>' +
+                '  <div id="Id_GB_' + ArrayGruposBebida[i].IdGrupoBebida + '_Eliminar_Modal" class="modal hide " >\n\
+                              <div class="modal-header">\n\
+                              <h3>Eliminación del grupo de bebida <b>' + ArrayGruposBebida[i].Nombre + '</b></h3>\n\
+                              </div>\n\
+                              <div class="modal-body" style="text-align:left;">\n\
+                                  <p>\n\
+                                  ¿Está seguro que desea eliminar el grupo de bebidas <b>' + ArrayGruposBebida[i].Nombre + '</b>? \n\
+                                  </p>\n\
+                                  <p>\n\
+                                   &nbsp; &nbsp;Tenga en cuenta que esta acción no se puede deshacer.\n\
+                                  </p>\n\
+                              </div>\n\
+                              <div class="modal-footer">\n\
+                                  <a href="javascript:void(0);" onClick="EliminarGrupoBebida(' + i + ')"  data-dismiss="modal" >Eliminar</a> <a href="javascript:void(0)" data-dismiss="modal" aria-hidden="true" class="btn btn-success">Cancelar</a>\n\
+                              </div>\n\
+                          </div>' +
+                '   </td><td class="boton" style="text-align:left;">' +
                 '       <a class="btn" href="javascript:void(0)" style="font-weight:bold" onclick="MostrarGBBebidas(' + i + ')"><i class="icon-tint"> </i> Bebidas</a> ' +
                 '       <a class="btn" href="javascript:void(0)" style="font-weight:bold" onclick="MostrarPrecios(1,' + i + ')" ><i class="icon-th-list"> </i> Precios</a>' +
                 '       <div id="Id_GB_' + ArrayGruposBebida[i].IdGrupoBebida + '_Bebidas" class="modal hide " >\n\
@@ -659,7 +701,7 @@ function AñadirGrupoBebida() {
 function ModificarGrupoBebida(index) {
     //debe introducir
     var cap = "#Id_GB_" + ArrayGruposBebida[index].IdGrupoBebida + "_";
-    if ($(cap + "Nombre").val() == "") {
+    if ($(cap + "Nombre").html() == "") {
         alert("Debe indicar el nombre del grupo de bebidas (Whisky, Ginebra, Cócteles...,)");
         return;
     }
@@ -672,7 +714,7 @@ function ModificarGrupoBebida(index) {
         $(cap + "Orden").val(++Max);
     }
 
-    servidor.stock.ModificarGrupoBebida(ArrayGruposBebida[index].IdGrupoBebida, $(cap + "Orden").val(), $(cap + "Nombre").val(), $(cap + "TipoGenerico").val(), (new ColorUtils($(cap + "Color").val())).Color
+    servidor.stock.ModificarGrupoBebida(ArrayGruposBebida[index].IdGrupoBebida, $(cap + "Orden").val(), $(cap + "Nombre").html(), $(cap + "TipoGenerico").val(), (new ColorUtils($(cap + "Color").val())).Color
         , function(bExito, id) {
             if (bExito) {
                 MostrarGruposBebida();
@@ -727,12 +769,29 @@ function RellenarGbBebidas(index, Callback) {
                         var bebida = self.Bebidas[i];
                         html +=
                             "<tr>\n\
-                                <td><input type='text' id='Id_GB_" + self.IdGrupoBebida + "_" + bebida.IdBebida + "_Bebida_Nombre'  value='" + bebida.Nombre + "' class='input-block-level' /></td>\n\
-                                <td ><input type='number' id='Id_GB_" + self.IdGrupoBebida + "_" + bebida.IdBebida + "_Bebida_Cantidad_Botella' min='0' step='50' class='input-mini numerico' value='" + bebida.Cantidad_Botella + "'/></td>\n\
-                                <td class='boton'><a class='btn' href='javascript:void()' onclick='ModificarBebida(" + index + "," + i + ")' class='btn'><i class='icon-refresh'> </i></a>\n\
-                                                  <a class='btn' href='javascript:void()' onclick='EliminarBebida(" + index + "," + i + ")' class='btn'><i class='icon-minus'> </i></a>\n\
+                                <td><span id='Id_GB_" + self.IdGrupoBebida + "_" + bebida.IdBebida + "_Bebida_Nombre' class='input-block-level uneditable-input' >" + bebida.Nombre + "</span></td>\n\
+                                <td ><input type='number' id='Id_GB_" + self.IdGrupoBebida + "_" + bebida.IdBebida + "_Bebida_Cantidad_Botella' min='0' step='50' class='input-mini numerico' value='" + bebida.Cantidad_Botella + "'  onchange='ModificarBebida(" + index + "," + i + ")' /></td>\n\
+                                <td class='boton'>\n\
+                                                  <!--<a class='btn' href='javascript:void()' onclick='ModificarBebida(" + index + "," + i + ")' class='btn'><i class='icon-refresh'> </i></a>-->\n\
+                                                  <a class='btn' data-toggle='modal' data-target='#Id_GB_" + self.IdGrupoBebida + "_" + bebida.IdBebida + "_Eliminar_Modal' class='btn'><i class='icon-minus'> </i></a>" +
+                            '  <div id="Id_GB_' + self.IdGrupoBebida + "_" + bebida.IdBebida + '_Eliminar_Modal" class="modal hide " >\n\
+                                                      <div class="modal-header">\n\
+                                                      <h3>Eliminación de la bebida <b>' + bebida.Nombre + '</b></h3>\n\
+                                                      </div>\n\
+                                                      <div class="modal-body" style="text-align:left;">\n\
+                                                          <p>\n\
+                                                          ¿Está seguro que desea eliminar la bebida <b>' + bebida.Nombre + '</b>? \n\
+                                                          </p>\n\
+                                                          <p>\n\
+                                                           &nbsp; &nbsp;Tenga en cuenta que esta acción no se puede deshacer.\n\
+                                                          </p>\n\
+                                                      </div>\n\
+                                                      <div class="modal-footer">\n\
+                                                          <a href="javascript:void(0);" onClick="EliminarBebida(' + index + "," + i + ')"  data-dismiss="modal" >Eliminar</a> <a href="javascript:void(0)" data-dismiss="modal" aria-hidden="true" class="btn btn-success">Cancelar</a>\n\
+                                                      </div>\n\
+                                                  </div>\n\
                                 </td>\n\
-                            </tr>";
+                            </tr>';
                     }
                     //añadir la última linea para poder añadir un precio
                     html +=
@@ -790,7 +849,7 @@ function ModificarBebida(index, i) {
     }
     var cap = "#Id_GB_" + ArrayGruposBebida[index].IdGrupoBebida + "_" + ArrayGruposBebida[index].Bebidas[i].IdBebida + "_Bebida_";
     //comprobaciones
-    if ($(cap + "Nombre").val() == "") {
+    if ($(cap + "Nombre").html() == "") {
         alert("Debe indicar un nombre");
         return;
     }
@@ -806,7 +865,7 @@ function ModificarBebida(index, i) {
             }
         }
     }
-    ArrayGruposBebida[index].ModificarBebida(ArrayGruposBebida[index].Bebidas[i].IdBebida, $(cap + "Nombre").val(), cantidad_botella
+    ArrayGruposBebida[index].ModificarBebida(ArrayGruposBebida[index].Bebidas[i].IdBebida, $(cap + "Nombre").html(), cantidad_botella
         , function(bExito, EvResultado) {
             if (!bExito) {
                 window.alert(EvResultado);
@@ -949,6 +1008,17 @@ function GestionarStock() {
                 });
         });
 
+}
+
+function ReiniciarStock() {
+    servidor.stock.ReiniciarStock(
+        function(bExito, strMensaje) {
+            if (!bExito) {
+                alert(strMensaje);
+                return;
+            }
+            GestionarStock();
+        });
 }
 
 function RellenarSelectRetales() {
@@ -1154,14 +1224,14 @@ function cambiarCheck(id) {
     } else {
         s_id = 'Id_Check_' + id;
     }
-    
-    if ($("#"+s_id).is(":checked")) {
-        if (typeof id === "string"){
+
+    if ($("#" + s_id).is(":checked")) {
+        if (typeof id === "string") {
             //deseleccionar todos los de la clase .sel_grupo_bebidas_checkbox
             $(".check_grupos").prop("checked", false);
-            if(s_id == "Id_Sel_GB_Todos"){
-               $("#Id_Sel_GB_Genericos").prop("checked", false);
-            }else{
+            if (s_id == "Id_Sel_GB_Todos") {
+                $("#Id_Sel_GB_Genericos").prop("checked", false);
+            } else {
                 $("#Id_Sel_GB_Todos").prop("checked", false);
             }
         }
@@ -1191,6 +1261,7 @@ function IniciarSesiónCotización() {
         alert("Debe seleccionar al menos un grupo de bebida para poder iniciar la sesión de cotización");
         return;
     }
+    bStock = $("input[name='rdStock']:checked").val() == "1"; 
     //vamos a cargar el stock en la cotización
     servidor.cotización.IniciarSesión(ArrayIdGruposBebida, function(bExito, strMensaje) {
         if (!bExito) {
@@ -1214,7 +1285,7 @@ function AbrirSesiónCotizacion() {
     $(".page-header").hide();
 
     //obtener todas las bebidas
-    servidor.stock.ListarBebidas(
+    servidor.stock.ListarBebidas(bStock,
         function(bExito, rowsArray) {
             if (!bExito) {
                 window.alert(rowsArray);
@@ -1240,7 +1311,11 @@ function AbrirSesiónCotizacion() {
                             <div class="modal-header">\n\
                             <h3>' + ArrayBebidas[i].NombreGrupoBebida + ' - ' + ArrayBebidas[i].Nombre + '</h3>\n\
                             </div>\n\
-                            <div class="modal-body" style="text-align:center;">\n\
+                            <div id="Id_Bebida_' + ArrayBebidas[i].IdBebida + '_modal_body" class="modal-body" style="text-align:center;">\n\
+                                <table align="center" >\n\
+                                    <tr id="Id_Bebida_' + ArrayBebidas[i].IdBebida + '_modal_body_tr">\n\
+                                    </tr>\n\
+                                </table>\n\
                             </div>\n\
                             <div class="modal-footer">\n\
                                 <a href="javascript:void(0)" data-dismiss="modal" aria-hidden="true" class="btn">Cerrar</a>\n\
@@ -1256,8 +1331,8 @@ function AbrirSesiónCotizacion() {
                         var oTipoServicio = rowsArray[j];
                         var p;
                         //vamos a añadir un botón con el nombre del servicio y el valor
-                        $("#Id_Bebida_" + oTipoServicio._parent.IdBebida + " .modal-body").append(
-                            '<a ' +
+                        $("#Id_Bebida_" + oTipoServicio._parent.IdBebida + "_modal_body_tr").append(
+                            '<td ><div><a ' +
                             "   style='color: " + (Math.round(oTipoServicio.Color.Luminosidad) ? '#000' : '#FFF') + ";" +
                             "           background-color: " + oTipoServicio.Color.Inc(5) + ";" +
                             "           background-image: -webkit-gradient(linear, 0 0, 0 100%, from(" + oTipoServicio.Color.Inc(70) + "), to(" + oTipoServicio.Color.Dec(0) + ")); " +
@@ -1276,7 +1351,32 @@ function AbrirSesiónCotizacion() {
                             '           </span> €' +
                             '       </span>' +
                             '   </div>' +
-                            '</a>');
+                            '</a></div>\n\
+                            <div>'+ (oTipoServicio.EnCotización ?
+                                ('<a id="Id_Bebida_' + oTipoServicio._parent.IdBebida + '_Id_T_Servicio_' + oTipoServicio.IdTipoServicio + '_FijarPrecio_a" data-toggle="modal" data-target="#Id_Bebida_' + oTipoServicio._parent.IdBebida + '_Id_T_Servicio_' + oTipoServicio.IdTipoServicio + '_FijarPrecio"  >Fijar Precio</a>\n\
+                                \n\
+                                    <div id="Id_Bebida_' + oTipoServicio._parent.IdBebida + '_Id_T_Servicio_' + oTipoServicio.IdTipoServicio + '_FijarPrecio" class="modal hide " >\n\
+                                        <div class="modal-header">\n\
+                                        <h3>Fijar Precio de ' + oTipoServicio.Nombre + ' de ' + oTipoServicio._parent.Nombre + '</h3>\n\
+                                        </div>\n\
+                                        <div class="modal-body" style="text-align:left; height: 200px;">' +
+                                        "<table class='mitabla'><thead><th>Grupo Bebida</th><th>Bebida</th><th>Precio</th></thead>\n\
+                                            <tr>\n\
+                                            <td>" + oTipoServicio._parent.NombreGrupoBebida + "</td>\n\
+                                            <td>" + oTipoServicio._parent.Nombre + "</td>\n\
+                                            <td><input type='number' id='Id_Bebida_" + oTipoServicio._parent.IdBebida + '_Id_T_Servicio_' + oTipoServicio.IdTipoServicio + "_FijarPrecio_Precio' min='0' step='0.1' class='input-mini numerico' value='" + oTipoServicio.PrecioInicial + "'  /></td>\n\
+                                            <td class='boton'>\n\
+                                                <a class='btn' id='Id_Bebida_" + oTipoServicio._parent.IdBebida + '_Id_T_Servicio_' + oTipoServicio.IdTipoServicio + "_FijarPrecio_btn_Fijar' href='javascript:void()' onclick='FijarPrecio(" + oTipoServicio._parent.IdBebida + "," + oTipoServicio.IdTipoServicio + ")' class='btn'> Fijar Precio</a>\n\
+                                                <a class='btn' id='Id_Bebida_" + oTipoServicio._parent.IdBebida + '_Id_T_Servicio_' + oTipoServicio.IdTipoServicio + "_FijarPrecio_btn_Liberar' href='javascript:void()' onclick='LiberarPrecio(" + oTipoServicio._parent.IdBebida + "," + oTipoServicio.IdTipoServicio + ")' class='btn' style='display:none'> Liberar Precio Fijado</a>\n\
+                                             </td>\n\
+                                        </tr></table>" +
+                                        '</div>\n\
+                                        <div class="modal-footer">\n\
+                                             <a href="javascript:void(0)" data-dismiss="modal" aria-hidden="true" >Cerrar</a>\n\
+                                        </div>\n\
+                                    </div>') : '<span title="Este precio esta fijado mediante configuración"  class="muted">Precio fijado</span>')+
+                            '</div>\n\
+                            </td>');
                     }
                     if (sec === ArrayBebidas.length)
                         //iniciar el temporizador con el tiempo que se nos indique en la sesión de servidor.cotización
@@ -1319,9 +1419,22 @@ function initTiempoSesión() {
 
             //ahora añadir los precios
             var p = "";
-            for (var i = 0; i < rowsArray.length; i++)
+            for (var i = 0; i < rowsArray.length; i++) {
                 $('#Id_Bebida_' + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + '_Precio')
                     .html(Left((p = (p = rowsArray[i][6].toString()) + (p.indexOf(".") > 0 ? '' : '.') + '00'), p.split(".")[0].length + 3));
+                $("#Id_Bebida_" + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + "_FijarPrecio_a")
+                    .html(rowsArray[i][9] == "0" ? " Fijar Precio" : "Liberar Precio Fijado");
+                if (rowsArray[i][9] == "0") {
+                    $("#Id_Bebida_" + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + "_FijarPrecio_btn_Fijar").show();
+                    $("#Id_Bebida_" + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + "_FijarPrecio_btn_Liberar").hide();
+                } else {
+
+                    $("#Id_Bebida_" + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + "_FijarPrecio_btn_Fijar").hide();
+                    $("#Id_Bebida_" + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + "_FijarPrecio_btn_Liberar").show();
+                    $("#Id_Bebida_" + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + "_FijarPrecio_Precio").val(rowsArray[i][6]);
+
+                }
+            }
             //adelantar un segundo el relog
             var segundos = parseInt($("#id_segundos").html(), 10);
 
@@ -1389,6 +1502,39 @@ function AñadirServicio(IdBebida, IdTipoServicio) {
             FinalizarServicio();
         }, 30 * 1000);
     });
+}
+
+function FijarPrecio(IdBebida, IdTipoServicio) {
+    var cap = '#Id_Bebida_' + IdBebida + '_Id_T_Servicio_' + IdTipoServicio;
+    //comprobaciones
+    if ($(cap + "_FijarPrecio_Precio").val() == "") {
+        alert("Debe indicar un precio");
+        return;
+    }
+    var oBebida = ArrayBebidas.obBebida(IdBebida)
+        , oTipoServicio = oBebida.TiposServicio.obTipoServicio(IdTipoServicio);
+    oTipoServicio.FijarPrecio($(cap + "_FijarPrecio_Precio").val()
+        , function(bExito, Mensaje) {
+            if (!bExito)
+                window.alert(Mensaje);
+            return;
+        });
+}
+
+function LiberarPrecio(IdBebida, IdTipoServicio) {
+    var oBebida = ArrayBebidas.obBebida(IdBebida)
+        , oTipoServicio = oBebida.TiposServicio.obTipoServicio(IdTipoServicio);
+    oTipoServicio.LiberarPrecio(
+        function(bExito, Mensaje) {
+            if (!bExito) {
+                window.alert(Mensaje);
+                return;
+            }
+            oTipoServicio.Cotizar(function(bExito, Mensaje) {
+                if (!bExito)
+                    window.alert(Mensaje);
+            });
+        });
 }
 
 function DuplicarDatoServicio(index) {

@@ -4,10 +4,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Cotizaci&oacute;n Espirituosa</title>
 
-        <link href="../css/bootstrap.css" rel="stylesheet" media="screen">
-        <link href="../css/bootstrap-responsive.css" rel="stylesheet">
-        <link href="../css/cotizacion_espirituosa.css" rel="stylesheet" media="screen">
-        <script src="../js/jquery.js" type="text/javascript"></script>
+        <link href="./css/bootstrap.css" rel="stylesheet" media="screen">
+        <link href="./css/bootstrap-responsive.css" rel="stylesheet">
+        <link href="./css/cotizacion_espirituosa.css" rel="stylesheet" media="screen">
+        <script src="./js/jquery.js" type="text/javascript"></script>
         <script src="./js/main.js" type="text/javascript" charset="utf-8"></script>
     </head>
     <body style="" >
@@ -51,7 +51,7 @@
                 </ul>
             </div>
             <div id="PanelSeleccionRol" class="span10"   style="display: none;" >
-                
+
                 <div class="well" style="max-width: 400px; margin: 0 auto 10px;">
                     <p> Seleccione el rol con que iniciar la herramienta:</p>
                     <a class="btn btn-primary btn-large btn-block " href="javascript:void(0)" onclick="fnRol(0)"><i class="icon-user icon-white"> </i> Camarero</a>
@@ -75,20 +75,20 @@
                                         <label  for="Id_Servidor">Servidor</label>
                                     </td>
                                     <td  colspan="3">
-                                        <input type="text" name="Id_Servidor" id="Id_Servidor" class="input-xlarge" value="" />
+                                        <input type="text" name="Id_Servidor" id="Id_Servidor" class="input-xlarge" value="" onchange="ModificarServidor()" />
                                     </td>
                                 </tr>
                             <td>
                                 <label  for="Id_Precio">Precio</label>
                             </td>
                             <td>
-                                <input type="number" min="0" step="0.10" name="Id_Precio" id="Id_Precio" class="tabla_Propiedades  input-mini numerico" value="" />
+                                <input type="number" min="0" step="0.10" name="Id_Precio" id="Id_Precio" class="tabla_Propiedades  input-mini numerico" value="" onchange="ModificarPreferencias('#Id_Precio')" />
                             </td>
                             <td>
                                 <label for="Id_Maximo">Maximo</label>
                             </td>
                             <td>
-                                <input type="number" min="0" step="0.1" name="Id_Maximo" id="Id_Maximo" class="tabla_Propiedades input-mini numerico" value="" />
+                                <input type="number" min="0" step="0.1" name="Id_Maximo" id="Id_Maximo" class="tabla_Propiedades input-mini numerico" value="" onchange="ModificarPreferencias('#Id_Maximo')" />
                             </td>
                             </tr>
                             <tr>
@@ -96,13 +96,13 @@
                                     <label  for="Id_Minimo">Minimo</label>
                                 </td>
                                 <td>
-                                    <input type="number" min="0" step="0.10" name="Id_Minimo" id="Id_Minimo" class="tabla_Propiedades input-mini numerico" value="" />
+                                    <input type="number" min="0" step="0.10" name="Id_Minimo" id="Id_Minimo" class="tabla_Propiedades input-mini numerico" value=""   onchange="ModificarPreferencias('#Id_Minimo')"/>
                                 </td>
                                 <td>
                                     <label for="Id_Tramo">Tramo</label>
                                 </td>
                                 <td>
-                                    <input type="number" min="0" step="0.10" name="Id_Tramo" id="Id_Tramo" class="tabla_Propiedades input-mini numerico" value="" />
+                                    <input type="number" min="0" step="0.10" name="Id_Tramo" id="Id_Tramo" class="tabla_Propiedades input-mini numerico" value="" onchange="ModificarPreferencias('#Id_Tramo')" />
                                 </td>
                             </tr>
                             <tr>
@@ -110,31 +110,33 @@
                                     <label for="Id_Cantidad_Botella">ml en cada botella</label>
                                 </td>
                                 <td>
-                                    <input type="number" min="0" step="50" name="Id_Cantidad_Botella" id="Id_Cantidad_Botella" class="tabla_Propiedades input-mini numerico" value="" /> 
+                                    <input type="number" min="0" step="50" name="Id_Cantidad_Botella" id="Id_Cantidad_Botella" class="tabla_Propiedades input-mini numerico" value="" onchange="ModificarPreferencias('#Id_Cantidad_Botella')" /> 
                                 </td>
                                 <td>
                                     <label for="Id_Cantidad_Stock">Botellas por marca</label>
                                 </td>
                                 <td>
-                                    <input type="number" min="0" step="1" name="Id_Cantidad_Stock" id="Id_Cantidad_Stock" class="tabla_Propiedades input-mini numerico" value="" /> 
+                                    <input type="number" min="0" step="1" name="Id_Cantidad_Stock" id="Id_Cantidad_Stock" class="tabla_Propiedades input-mini numerico" value="" onchange="ModificarPreferencias('#Id_Cantidad_Stock')" /> 
                                 </td>
                             </tr>
+                            <!--
                             <tr>
                                 <td >
                                     <label for="Id_Contraseña_Encargado">Contraseña Encargado</label>
                                 </td>
                                 <td colspan="3">
-                                    <input type="password" name="Id_Contraseña_Encargado" id="Id_Contraseña_Encargado" class="tabla_Propiedades input-xlarge" value="" /> 
+                                    <input type="password" name="Id_Contraseña_Encargado" id="Id_Contraseña_Encargado" class="tabla_Propiedades input-xlarge" value="" onchange="ModificarPreferencias('#Id_Contraseña_Encargado')" /> 
                                 </td>
                             </tr>
+                            -->
                             </tbody>
-                            <tfoot>
+                            <!--  <tfoot>
                                 <tr>
                                     <td  colspan="4">
                                         <a class="btn" id="ActualizarPreferencias" href="javascript:void(0);"><i class="icon-refresh"></i> Actualizar</a>
                                     </td>
                                 </tr>
-                            </tfoot>
+                            </tfoot>-->
                         </table>
                     </div>
                     <div class="tab-pane" id="tabTiposServicio">
@@ -167,8 +169,12 @@
             </div>
             <div id="PanelGestionarStock" class = "panel span10" style="display: none;"   >
                 <table id='Id_Tabla_Bebidas' class="tabla_Grupo_Bebidas">	
-                    <caption > <input type='text' id='filtro' class='input-block-level' placeholder='Filtro: Introduzca nombre de bebida o grupo' onKeyup='Buscar()'/></caption>
-                    <thead>
+                    <caption > 
+                        <a class="btn" href="javascript::void();" onclick="ReiniciarStock()" title="Reinicia el stock de bebidas a la cantidad de botellas que se haya indicado por defecto" >Reiniciar Stock </a>
+                        <input type='text' id='filtro' class='input-xxlarge' style="margin-top: 12px;" placeholder='Filtro: Introduzca nombre de bebida o grupo' onKeyup='Buscar()'/>
+                    </caption>
+
+                    <thead>  
                         <tr>
                             <th>Bebida</th>
                             <th>Grupo</th> 
@@ -190,7 +196,19 @@
                 </table>
             </div>
             <div id="PanelIniciarSesiónCotización" class="panel span10" style="display: none;"  >
-                <table id="Id_Tabla_Sel_Grupo_Bebidas" class="tabla_Grupo_Bebidas">
+                <table class="tabla_Grupo_Bebidas tabla_Iniciar_Sesion">
+                    <caption>Seleccione Tipo de inicio cotización</caption>
+                    <tbody>
+                    <tr>
+                        <td>
+                            <label  class="radio"   ><input type="radio" name="rdStock" value="0" checked="checked"  />Iniciar con el mismo precio</label>
+                        </td></tr><tr><td>
+                            <label  class="radio"  ><input type="radio" name="rdStock" value="1" />Iniciar con precios según stock</label>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <table id="Id_Tabla_Sel_Grupo_Bebidas" class="tabla_Grupo_Bebidas tabla_Iniciar_Sesion" >
                     <caption>Seleccione Grupos de Bebida para iniciar la cotización</caption>
                     <tbody id="tbody_Sel_Grupos_Bebida">
                         <tr>

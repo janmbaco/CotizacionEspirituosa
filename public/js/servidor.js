@@ -307,7 +307,6 @@ var servidor = (function() {
                 this.IdTipoServicio;
                 this.NombreTipoServicio;
             };
-
             var CBebida = function() {
                 this.IdBebida;
                 this.Nombre;
@@ -320,7 +319,7 @@ var servidor = (function() {
                 this.TiposServicio = [];
                 //funciones
                 this.ListarTiposServicio = function(EvResultado) {
-                    cmdAjax("stock.Bebidas", "ListarTiposServicio", [this.IdGrupoBebida, this.IdBebida, this.bTiposGenericos]
+                    cmdAjax("stock.Bebidas", "ListarTiposServicio", [this.IdGrupoBebida, this.IdBebida, this.bTiposGenericos, this.RelacionInicial]
                         , function(bExito, rowsArray, self) {
                             if (!bExito) {
                                 if (!isUndefined(EvResultado))
@@ -402,7 +401,6 @@ var servidor = (function() {
                     cmdAjax("servicios.TiposServicio", "Cotizar", [this._parent.IdGrupoBebida, this._parent.IdBebida, this.IdTipoServicio, this._parent.RelacionInicial, this.PrecioInicial, this.Maximo, this.Minimo, this.Tramo], EvObtResultado);
                 };
             };
-
             return {
                 ListarGruposBebida: function(EvObtResultados) {
                     cmdAjax("stock", "ListarGruposBebida", []
@@ -434,7 +432,7 @@ var servidor = (function() {
                 , QuitarGrupoBebida: function(idGrupoBebida, EvResultado) {
                     cmdAjax("stock", "QuitarGrupoBebida", [idGrupoBebida], EvResultado);
                 }
-                , ListarBebidas: function(EvObtResultados) {
+                , ListarBebidas: function(bStock, EvObtResultados) {
                     cmdAjax("stock", "ListarBebidas", []
                         , function(bExito, rowsArray) {
                             if (!bExito) {
@@ -450,7 +448,7 @@ var servidor = (function() {
                                 ArrayBebidas[i].Nombre = rowsArray[i][1];
                                 ArrayBebidas[i].IdGrupoBebida = parseInt(rowsArray[i][2], 10);
                                 ArrayBebidas[i].NombreGrupoBebida = rowsArray[i][3];
-                                ArrayBebidas[i].RelacionInicial = parseFloat(rowsArray[i][4]);
+                                ArrayBebidas[i].RelacionInicial = (bStock ? 1 / parseInt(rowsArray[i][5], 10) :  parseFloat(rowsArray[i][4]));
                                 ArrayBebidas[i].Cantidad_Bebidas = parseInt(rowsArray[i][5], 10);
                                 ArrayBebidas[i].bTiposGenericos = rowsArray[i][6] == 1;
                                 ArrayBebidas[i].Color = new ColorUtils(rowsArray[i][7]);
@@ -477,6 +475,9 @@ var servidor = (function() {
                 }
                 , StockBebida: function(idBebida, EvObtResultado) {
                     cmdAjax("stock", "StockBebida", [idBebida], EvObtResultado);
+                }
+                , ReiniciarStock: function(EvResultado){
+                    cmdAjax("stock", "ReiniciarStock", [], EvResultado);
                 }
                 , ModificarStockBebida: function(idBebida, Cantidad_Stock, EvResultado) {
                     cmdAjax("stock", "ModificarStockBebida", [idBebida, Cantidad_Stock], EvResultado);

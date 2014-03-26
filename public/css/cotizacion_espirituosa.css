@@ -201,20 +201,20 @@ h1{
     margin: 2px;
     padding: 2px;
 }
-#Id_Tabla_Sel_Grupo_Bebidas
+.tabla_Iniciar_Sesion
 {
     
     min-width: 525px;
     width: 525px;
 }
 
-#Id_Tabla_Sel_Grupo_Bebidas td label{
+.tabla_Iniciar_Sesion td label{
     
     font-size: 12pt;
     
 }
 
-#Id_Tabla_Sel_Grupo_Bebidas > tfoot td{
+.tabla_Iniciar_Sesion > tfoot td{
     border: 0;
     text-align: right;
 }
