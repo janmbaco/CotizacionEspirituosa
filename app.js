@@ -49,7 +49,6 @@ app.get('/wsjson', function(req, res) {
     var funcion = req.query.funcion;
     var params = "";
     if (!global.isUndefined(req.query.param)) {
-        console.log(JSON.stringify(req.query.param));
         if (typeof req.query.param === "object") {
             for (var i = 0; i < req.query.param.length; i++)
             {
@@ -69,7 +68,6 @@ app.get('/wsjson', function(req, res) {
         }
     }
     params += "EvResultado";
-    console.log(params);
     //en el req.query recibo un objeto que tiene como minimo paquete y funcion
     eval(paquete + "." + funcion + "(" + params + ");");
 
