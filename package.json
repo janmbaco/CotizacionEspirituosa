@@ -9,8 +9,7 @@
     "express": "3.4.4",
     "jade": "*",
     "sqlite3": "~2.1.19",
-    "bootstrap": "*",
-    "less": "*"
+    "bootstrap": "*"
   },
   "description": "Cotización de bebidas alcoholicas en un bar atendiendo al consumo de una noche.",
   "main": "app.js",
@@ -21,7 +20,6 @@
   "engines": {
     "node": "0.10.x"
   },
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/janmbaco/CotizacionEspirituosa.git"

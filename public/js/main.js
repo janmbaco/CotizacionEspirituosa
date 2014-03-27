@@ -42,8 +42,39 @@ var TimeOutFinalizarServicios;
 
 //Eventos al cargar la página
 $("document").ready(function() {
+	//si no hay servidor debe indicar un servidor
+	if (isUndefined(localStorage["servidor"])){
+		$("#Id_Modal_Servidor").modal("show");
+	} else {
+		Iniciar();
+	}
 
-    //comprobar si ya está la sesión abierta
+    //al hacer click en una clase de pantalla
+    $(".pantalla").click(function() {
+        sessionStorage["estado"] = this.id;
+    });
+
+    $.extend($.expr[":"],
+        {
+            "contiene-palabra": function(elem, i, match, array) {
+                return (elem.textContent || elem.innerText || $(elem).text() || "").toLowerCase().indexOf((match[3] || "").toLowerCase()) >= 0;
+            }
+        });
+});
+
+function ComprobarServidor(){
+
+if($("#IdTxtServidor").val() == ""){
+	window.alert("Debe indicar un servidor para iniciar la herramienta");
+	return;
+}
+localStorage["servidor"] = $("#IdTxtServidor").val();
+Iniciar();
+$('#Id_Modal_Servidor').modal('hide');
+}
+
+function Iniciar(){
+//comprobar si ya está la sesión abierta
     servidor.cotización.SesiónIniciada(function(bExito, bSesiónIniciada) {
         if (!bExito) {
             window.alert(resultados);
@@ -98,25 +129,10 @@ $("document").ready(function() {
 
         }
     });
-
-    //al hacer click en una clase de pantalla
-    $(".pantalla").click(function() {
-        sessionStorage["estado"] = this.id;
-    });
-
-    $.extend($.expr[":"],
-        {
-            "contiene-palabra": function(elem, i, match, array) {
-                return (elem.textContent || elem.innerText || $(elem).text() || "").toLowerCase().indexOf((match[3] || "").toLowerCase()) >= 0;
-            }
-        });
-});
+}
 
 //Rellenar las propiedades de configuración
 function MostrarOpcionesxDefecto() {
-    //if no hay servidor colocar el servidor 
-    if (isUndefined(localStorage["servidor"]))
-        localStorage["servidor"] = window.location.origin;
     $("#Id_Servidor").val(localStorage["servidor"]);
     servidor.propiedades.ListarPropiedades(
         function(bExito, rowsArray) {

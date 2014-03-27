@@ -11,7 +11,7 @@
         <script src="./js/main.js" type="text/javascript" charset="utf-8"></script>
     </head>
     <body style="" >
-        <div class='page-header' style=" background-color: #0088cc; min-height: 105px; background-image: url('../img/an.png');  background-position: 50px; background-repeat: no-repeat;padding:0px  ;padding-bottom: 20px; ;margin:0;">
+        <div class='page-header' style=" background-color: #0088cc; min-height: 105px; background-image: url('./img/an.png');  background-position: 50px; background-repeat: no-repeat;padding:0px  ;padding-bottom: 20px; ;margin:0;">
 
         </div>
         <div class="container row-fluid" style='margin-top: 10px;'>
@@ -46,7 +46,7 @@
                     </li>
                     -->
                     <li class="menu sesión">
-                        <a href="../visor/" target="_blank" ><i class="icon-road"> </i>Visor Cotización</a>
+                        <a href="./visor/" target="_blank" ><i class="icon-road"> </i>Visor Cotización</a>
                     </li>
                 </ul>
             </div>
@@ -252,6 +252,17 @@
                     <a href="javascript:void(0)"  class="btn btn-success btn-large" onclick="FinalizarServicio()">Finalizar Servicio</a>
                 </div>
             </div>
+			<div id="Id_Modal_Servidor" class="modal hide">
+                <div class="modal-header"><h3>Servidor de la aplicación</h3></div>
+                <div class="modal-body">
+                  <label class="control-label" for="IdTxtServidor">Indique un servidor</label>
+				   <input type="text" id="IdTxtServidor" val="" />
+                </div>
+                <div class="modal-footer">
+                    <a href="javascript:void(0)" class="btn" onclick="ComprobarServidor()">Continuar</a>
+                </div>
+            </div>
+			
         </div>
         <div  class="navbar navbar-fixed-bottom">
             <div ><a href="mailto:janmbaco@gmail.com" >Jos&eacute; &Aacute;ngel Navarro</a></div>
