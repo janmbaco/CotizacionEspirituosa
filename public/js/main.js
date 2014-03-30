@@ -42,12 +42,14 @@ var TimeOutFinalizarServicios;
 
 //Eventos al cargar la página
 $("document").ready(function() {
-	//si no hay servidor debe indicar un servidor
-	if (isUndefined(localStorage["servidor"])){
-		$("#Id_Modal_Servidor").modal("show");
-	} else {
-		Iniciar();
-	}
+    //if no hay servidor colocar el servidor 
+    if (isUndefined(localStorage["servidor"]))
+        localStorage["servidor"] = window.location.origin;
+    if(localStorage["servidor"].indexOf("file")> -1){
+        $("#Id_Modal_Servidor").modal("show");
+    } else{
+        Iniciar();
+    }
 
     //al hacer click en una clase de pantalla
     $(".pantalla").click(function() {
@@ -62,18 +64,18 @@ $("document").ready(function() {
         });
 });
 
-function ComprobarServidor(){
+function ComprobarServidor() {
 
-if($("#IdTxtServidor").val() == ""){
-	window.alert("Debe indicar un servidor para iniciar la herramienta");
-	return;
-}
-localStorage["servidor"] = $("#IdTxtServidor").val();
-Iniciar();
-$('#Id_Modal_Servidor').modal('hide');
+    if ($("#IdTxtServidor").val() == "") {
+        window.alert("Debe indicar un servidor para iniciar la herramienta");
+        return;
+    }
+    localStorage["servidor"] = $("#IdTxtServidor").val();
+    Iniciar();
+    $('#Id_Modal_Servidor').modal('hide');
 }
 
-function Iniciar(){
+function Iniciar() {
 //comprobar si ya está la sesión abierta
     servidor.cotización.SesiónIniciada(function(bExito, bSesiónIniciada) {
         if (!bExito) {
@@ -83,38 +85,63 @@ function Iniciar(){
         SesiónIniciada = bSesiónIniciada;
         if (bSesiónIniciada) {
 
-            //vamos a comprobar si está listo este tpv
-            if (isUndefined(localStorage[TPV])) {
-                //mostrar la página para introducir un nombre del TPV
+
+            //iniciar el temporizador con el tiempo que se nos indique en la sesión de servidor.cotización
+            servidor.cotización.TiempoSesión(function(bExito, resultado) {
+                if (!bExito)
+                {
+                    window.alert(resultado);
+                    return;
+                }
+                //muestro los menus de sesion
+                $(".panel").hide();
+                $("#PanelSesiónCotización").show();
+                $(".sesión").show();
+                $("#Id_TiempoSesión").addClass('active');
                 $(".configuración").hide();
-                MostrarPanelSesiónCotización();
-                return;
-            }
-            //muestro los menus de sesion
-            $(".sesión").show();
-            $("#Id_TiempoSesión").addClass('active');
-            $(".configuración").hide();
-            //continuo con la sesión iniciada
-            //añadir servicios no finalizados
-            if (!isUndefined(localStorage[ServiciosNoFinalizados])) {
-                var p;
-                try {
-                    ArrDatosServicioActual[i] = JSON.parse((localStorage[ServiciosNoFinalizados + "_ArrDatoServicio"]));
-                    $('#Id_Modal_Resumen_Servicios .modal-body tbody').append(localStorage[ServiciosNoFinalizados + "_Filas"]);
+                $(".page-header").hide();
 
-                } catch (e) {
+                //obtenemos la diferencia
+                var segundos = resultado.TiempoSesión % 60;
+                var minutos = parseInt(resultado.TiempoSesión / 60) % 60;
+                var horas = parseInt(resultado.TiempoSesión / 60 / 60);
+                $("#id_segundos").html((segundos > 9 ? "" : "0") + segundos);
+                $("#id_minutos").html((minutos > 9 ? "" : "0") + minutos);
+                $("#id_horas").html((horas > 9 ? "" : "0") + horas);
+                if (!resultado.Pausada) {
+                    $("#Id_ReanudarTemporizador").hide();
+                    intervalo = initTiempoSesión();
+                } else {
+                    $("#Id_PausarTemporizador").hide();
+                }            //vamos a comprobar si está listo este tpv
+                if (isUndefined(localStorage[TPV])) {
+                    //mostrar la página para introducir un nombre del TPV
+                    $(".configuración").hide();
+                    MostrarPanelSesiónCotización();
+                    return;
                 }
+                //añadir servicios no finalizados
+                if (!isUndefined(localStorage[ServiciosNoFinalizados])) {
+                    var p;
+                    try {
+                        ArrDatosServicioActual[i] = JSON.parse((localStorage[ServiciosNoFinalizados + "_ArrDatoServicio"]));
+                        $('#Id_Modal_Resumen_Servicios .modal-body tbody').append(localStorage[ServiciosNoFinalizados + "_Filas"]);
 
-                if (ArrDatosServicioActual.length > 0) {
-                    for (var i = 0; i < ArrDatosServicioActual.length; i++)
-                        p += parseFloat(ArrDatosServicioActual[i].Precio);
-                    $("#Id_TotalServicio").html(Left(p = p + (p.toString().indexOf(".") === -1 ? "." : "") + '00', p.split(".")[0].length + 3) + " €");
-                    TimeOutFinalizarServicios = setTimeout(function() {
-                        FinalizarServicio();
-                    }, 30 * 1000);
+                    } catch (e) {
+                    }
+
+                    if (ArrDatosServicioActual.length > 0) {
+                        for (var i = 0; i < ArrDatosServicioActual.length; i++)
+                            p += parseFloat(ArrDatosServicioActual[i].Precio);
+                        $("#Id_TotalServicio").html(Left(p = p + (p.toString().indexOf(".") === -1 ? "." : "") + '00', p.split(".")[0].length + 3) + " €");
+                        TimeOutFinalizarServicios = setTimeout(function() {
+                            FinalizarServicio();
+                        }, 30 * 1000);
+                    }
                 }
-            }
-            AbrirSesiónCotizacion();
+                AbrirSesiónCotizacion();
+            });
+
         }
         else {
             $(".sesión").hide();
@@ -1277,13 +1304,21 @@ function IniciarSesiónCotización() {
         alert("Debe seleccionar al menos un grupo de bebida para poder iniciar la sesión de cotización");
         return;
     }
-    bStock = $("input[name='rdStock']:checked").val() == "1"; 
+    bStock = $("input[name='rdStock']:checked").val() == "1";
     //vamos a cargar el stock en la cotización
     servidor.cotización.IniciarSesión(ArrayIdGruposBebida, function(bExito, strMensaje) {
         if (!bExito) {
             alert(strMensaje);
             return;
         }
+        $(".panel").hide();
+        $("#PanelSesiónCotización").show();
+        $(".sesión").show();
+        $("#Id_TiempoSesión").addClass('active');
+        $(".configuración").hide();
+        $(".page-header").hide();
+        $("#Id_ReanudarTemporizador").hide();
+        initTiempoSesión();
         //Abro la sesión de cotización
         AbrirSesiónCotizacion();
         //abrir en una nueva ventan el visor de regilla
@@ -1293,12 +1328,7 @@ function IniciarSesiónCotización() {
 }
 
 function AbrirSesiónCotizacion() {
-    $(".panel").hide();
-    $("#PanelSesiónCotización").show();
-    $(".sesión").show();
-    $("#Id_TiempoSesión").addClass('active');
-    $(".configuración").hide();
-    $(".page-header").hide();
+
 
     //obtener todas las bebidas
     servidor.stock.ListarBebidas(bStock,
@@ -1322,7 +1352,7 @@ function AbrirSesiónCotizacion() {
                     "        background-image: -o-linear-gradient(top, " + ArrayBebidas[i].Color.Inc(70) + ", " + ArrayBebidas[i].Color.Dec(0) + ");" +
                     "        background-image: linear-gradient(to bottom, " + ArrayBebidas[i].Color.Inc(70) + ", " + ArrayBebidas[i].Color.Dec(0) + ");" +
                     "        text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25); background-repeat: repeat-x; border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25); ' " +
-                    "><div>" + ArrayBebidas[i].Nombre + "</div></a>";
+                    "><div class='Titulo'  id='Id_Bebida_" + ArrayBebidas[i].IdBebida + "_div' >" + ArrayBebidas[i].Nombre + "<table class='Precios'></table></div></a>";
                 html += '<div id="Id_Bebida_' + ArrayBebidas[i].IdBebida + '" class="modal hide " >\n\
                             <div class="modal-header">\n\
                             <h3>' + ArrayBebidas[i].NombreGrupoBebida + ' - ' + ArrayBebidas[i].Nombre + '</h3>\n\
@@ -1346,6 +1376,11 @@ function AbrirSesiónCotizacion() {
                     for (var j = 0; j < rowsArray.length; j++) {
                         var oTipoServicio = rowsArray[j];
                         var p;
+                        if (oTipoServicio.EnCotización)
+                            $("#Id_Bebida_" + oTipoServicio._parent.IdBebida + "_div .Precios").append("<tr><td>" + oTipoServicio.Nombre + "</td><td>" +
+                                '           <span class="Id_Bebida_' + oTipoServicio._parent.IdBebida + '_Id_T_Servicio_' + oTipoServicio.IdTipoServicio + '_Precio">' +
+                                Left((p = (p = oTipoServicio.PrecioInicial.toString()) + (p.indexOf(".") > 0 ? '' : '.') + '00'), p.split(".")[0].length + 3) +
+                                '</span>€</td></tr>');
                         //vamos a añadir un botón con el nombre del servicio y el valor
                         $("#Id_Bebida_" + oTipoServicio._parent.IdBebida + "_modal_body_tr").append(
                             '<td ><div><a ' +
@@ -1362,13 +1397,13 @@ function AbrirSesiónCotizacion() {
                             '   class="bebidas btn"> ' +
                             '   <div>' + oTipoServicio.Nombre + '<br />' +
                             '       <span style="font-size: 9pt; font-weight: bold;">Precio: ' +
-                            '           <span id="Id_Bebida_' + oTipoServicio._parent.IdBebida + '_Id_T_Servicio_' + oTipoServicio.IdTipoServicio + '_Precio">' +
+                            '           <span class="Id_Bebida_' + oTipoServicio._parent.IdBebida + '_Id_T_Servicio_' + oTipoServicio.IdTipoServicio + '_Precio">' +
                             '               ' + Left((p = (p = oTipoServicio.PrecioInicial.toString()) + (p.indexOf(".") > 0 ? '' : '.') + '00'), p.split(".")[0].length + 3) +
-                            '           </span> €' +
+                            '</span>€' +
                             '       </span>' +
                             '   </div>' +
                             '</a></div>\n\
-                            <div>'+ (oTipoServicio.EnCotización ?
+                            <div>' + (oTipoServicio.EnCotización ?
                                 ('<a id="Id_Bebida_' + oTipoServicio._parent.IdBebida + '_Id_T_Servicio_' + oTipoServicio.IdTipoServicio + '_FijarPrecio_a" data-toggle="modal" data-target="#Id_Bebida_' + oTipoServicio._parent.IdBebida + '_Id_T_Servicio_' + oTipoServicio.IdTipoServicio + '_FijarPrecio"  >Fijar Precio</a>\n\
                                 \n\
                                     <div id="Id_Bebida_' + oTipoServicio._parent.IdBebida + '_Id_T_Servicio_' + oTipoServicio.IdTipoServicio + '_FijarPrecio" class="modal hide " >\n\
@@ -1376,7 +1411,7 @@ function AbrirSesiónCotizacion() {
                                         <h3>Fijar Precio de ' + oTipoServicio.Nombre + ' de ' + oTipoServicio._parent.Nombre + '</h3>\n\
                                         </div>\n\
                                         <div class="modal-body" style="text-align:left; height: 200px;">' +
-                                        "<table class='mitabla'><thead><th>Grupo Bebida</th><th>Bebida</th><th>Precio</th></thead>\n\
+                                    "<table class='mitabla'><thead><th>Grupo Bebida</th><th>Bebida</th><th>Precio</th></thead>\n\
                                             <tr>\n\
                                             <td>" + oTipoServicio._parent.NombreGrupoBebida + "</td>\n\
                                             <td>" + oTipoServicio._parent.Nombre + "</td>\n\
@@ -1386,37 +1421,17 @@ function AbrirSesiónCotizacion() {
                                                 <a class='btn' id='Id_Bebida_" + oTipoServicio._parent.IdBebida + '_Id_T_Servicio_' + oTipoServicio.IdTipoServicio + "_FijarPrecio_btn_Liberar' href='javascript:void()' onclick='LiberarPrecio(" + oTipoServicio._parent.IdBebida + "," + oTipoServicio.IdTipoServicio + ")' class='btn' style='display:none'> Liberar Precio Fijado</a>\n\
                                              </td>\n\
                                         </tr></table>" +
-                                        '</div>\n\
+                                    '</div>\n\
                                         <div class="modal-footer">\n\
                                              <a href="javascript:void(0)" data-dismiss="modal" aria-hidden="true" >Cerrar</a>\n\
                                         </div>\n\
-                                    </div>') : '<span title="Este precio esta fijado mediante configuración"  class="muted">Precio fijado</span>')+
+                                    </div>') : '<span title="Este precio esta fijado mediante configuración"  class="muted">Precio fijado</span>') +
                             '</div>\n\
                             </td>');
                     }
-                    if (sec === ArrayBebidas.length)
-                        //iniciar el temporizador con el tiempo que se nos indique en la sesión de servidor.cotización
-                        servidor.cotización.TiempoSesión(function(bExito, resultado) {
-                            if (!bExito)
-                            {
-                                window.alert(resultado);
-                                return;
-                            }
-
-                            //obtenemos la diferencia
-                            var segundos = resultado.TiempoSesión % 60;
-                            var minutos = parseInt(resultado.TiempoSesión / 60) % 60;
-                            var horas = parseInt(resultado.TiempoSesión / 60 / 60);
-                            $("#id_segundos").html((segundos > 9 ? "" : "0") + segundos);
-                            $("#id_minutos").html((minutos > 9 ? "" : "0") + minutos);
-                            $("#id_horas").html((horas > 9 ? "" : "0") + horas);
-                            if (!resultado.Pausada) {
-                                $("#Id_ReanudarTemporizador").hide();
-                                intervalo = initTiempoSesión();
-                            } else {
-                                $("#Id_PausarTemporizador").hide();
-                            }
-                        });
+                    if (sec === ArrayBebidas.length) {
+                        ActualizarPrecios();
+                    }
                 });
 
             }
@@ -1428,52 +1443,56 @@ function AbrirSesiónCotizacion() {
 
 function initTiempoSesión() {
     return setInterval(function() {
-        //obtener los precios de todos los productos
-        servidor.cotización.ListarCotización(function(bExito, rowsArray) {
-            if (!bExito)
-                return;
+        //adelantar un segundo el relog
+        var segundos = parseInt($("#id_segundos").html(), 10);
 
-            //ahora añadir los precios
-            var p = "";
-            for (var i = 0; i < rowsArray.length; i++) {
-                $('#Id_Bebida_' + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + '_Precio')
-                    .html(Left((p = (p = rowsArray[i][6].toString()) + (p.indexOf(".") > 0 ? '' : '.') + '00'), p.split(".")[0].length + 3));
-                $("#Id_Bebida_" + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + "_FijarPrecio_a")
-                    .html(rowsArray[i][9] == "0" ? " Fijar Precio" : "Liberar Precio Fijado");
-                if (rowsArray[i][9] == "0") {
-                    $("#Id_Bebida_" + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + "_FijarPrecio_btn_Fijar").show();
-                    $("#Id_Bebida_" + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + "_FijarPrecio_btn_Liberar").hide();
-                } else {
-
-                    $("#Id_Bebida_" + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + "_FijarPrecio_btn_Fijar").hide();
-                    $("#Id_Bebida_" + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + "_FijarPrecio_btn_Liberar").show();
-                    $("#Id_Bebida_" + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + "_FijarPrecio_Precio").val(rowsArray[i][6]);
-
-                }
-            }
-            //adelantar un segundo el relog
-            var segundos = parseInt($("#id_segundos").html(), 10);
-
-            if (segundos === 59)
-            {
-                $("#id_segundos").html("00");
-                var minutos = parseInt($("#id_minutos").html(), 10);
-                if (minutos === 59) {
-                    $("#id_minutos").html("00");
-                    var horas = parseInt($("#id_horas").html(), 10);
-                    horas++;
-                    $("#id_horas").html((horas > 9 ? "" : "0") + horas);
-                } else {
-                    minutos++;
-                    $("#id_minutos").html((minutos > 9 ? "" : "0") + minutos);
-                }
+        if (segundos === 59)
+        {
+            $("#id_segundos").html("00");
+            var minutos = parseInt($("#id_minutos").html(), 10);
+            if (minutos === 59) {
+                $("#id_minutos").html("00");
+                var horas = parseInt($("#id_horas").html(), 10);
+                horas++;
+                $("#id_horas").html((horas > 9 ? "" : "0") + horas);
             } else {
-                segundos++;
-                $("#id_segundos").html((segundos > 9 ? "" : "0") + segundos);
+                minutos++;
+                $("#id_minutos").html((minutos > 9 ? "" : "0") + minutos);
             }
-        });
+        } else {
+            segundos++;
+            $("#id_segundos").html((segundos > 9 ? "" : "0") + segundos);
+        }
+
 
     }, 1000);
+}
+
+function ActualizarPrecios() {
+
+    servidor.cotización.ListarCotización(function(bExito, rowsArray) {
+        if (!bExito)
+            return;
+
+        //ahora añadir los precios
+        var p = "";
+        for (var i = 0; i < rowsArray.length; i++) {
+            $('.Id_Bebida_' + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + '_Precio')
+                .html(Left((p = (p = rowsArray[i][6].toString()) + (p.indexOf(".") > 0 ? '' : '.') + '00'), p.split(".")[0].length + 3));
+            $("#Id_Bebida_" + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + "_FijarPrecio_a")
+                .html(rowsArray[i][9] == "0" ? " Fijar Precio" : "Liberar Precio Fijado");
+            if (rowsArray[i][9] == "0") {
+                $("#Id_Bebida_" + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + "_FijarPrecio_btn_Fijar").show();
+                $("#Id_Bebida_" + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + "_FijarPrecio_btn_Liberar").hide();
+            } else {
+
+                $("#Id_Bebida_" + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + "_FijarPrecio_btn_Fijar").hide();
+                $("#Id_Bebida_" + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + "_FijarPrecio_btn_Liberar").show();
+                $("#Id_Bebida_" + rowsArray[i][2] + '_Id_T_Servicio_' + rowsArray[i][4] + "_FijarPrecio_Precio").val(rowsArray[i][6]);
+
+            }
+        }
+    });
 }
 
 function AñadirServicio(IdBebida, IdTipoServicio) {
@@ -1613,7 +1632,7 @@ function EliminarDatoServicio(index) {
 }
 
 function FinalizarServicio() {
-
+    $('#Id_Modal_Resumen_Servicios').modal('hide');
     if (ArrDatosServicioActual.length > 0) {
         servidor.servicios.AñadirServicio(ArrDatosServicioActual,
             function(bExito, strMensaje) {
@@ -1626,19 +1645,31 @@ function FinalizarServicio() {
                 $('#Id_Modal_Resumen_Servicios .modal-body tbody').html("");
                 //eliminar la cache del localstorage con respecto a este servicio
                 localStorage[ServiciosNoFinalizados] = 0;
-                $('#Id_Modal_Resumen_Servicios').modal('hide');
+
                 //vamos a cotizar todos aquellos tipos de servicio a cotizar
                 var ArrGruposBebidaACotizar = [];
                 for (var i = 0; i < ArrayBebidas.length; i++)
                     for (var j = 0; j < ArrayBebidas[i].TiposServicio.length; j++)
                         if (ArrayBebidas[i].TiposServicio[j].bAcotizar)
                             ArrGruposBebidaACotizar[ArrGruposBebidaACotizar.length] = ArrayBebidas[i].IdGrupoBebida;
-
+                var ArrTiposServicioACotizar = [];
                 for (var i = 0; i < ArrGruposBebidaACotizar.length; i++)
                     for (var j = 0; j < ArrayBebidas.length; j++)
                         if (ArrayBebidas[j].IdGrupoBebida === ArrGruposBebidaACotizar[i])
                             for (var k = 0; k < ArrayBebidas[j].TiposServicio.length; k++)
-                                ArrayBebidas[j].TiposServicio[k].Cotizar();
+                                ArrTiposServicioACotizar[ArrTiposServicioACotizar.length] = ArrayBebidas[j].TiposServicio[k];
+                var sec = 0;
+                var Cotizar = function(tipoServicio) {
+                    tipoServicio.Cotizar(function() {
+                        sec++;
+                        if (sec == ArrTiposServicioACotizar.length) {
+                            ActualizarPrecios();
+                        } else {
+                            Cotizar(ArrTiposServicioACotizar[sec]);
+                        }
+                    });
+                };
+                Cotizar(ArrTiposServicioACotizar[0]);
 
             });
     } else {
@@ -1646,7 +1677,6 @@ function FinalizarServicio() {
         $('#Id_Modal_Resumen_Servicios .modal-body tbody').html("");
         //eliminar la cache del localstorage con respecto a este servicio
         localStorage[ServiciosNoFinalizados] = 0;
-        $('#Id_Modal_Resumen_Servicios').modal('hide');
     }
 
 }

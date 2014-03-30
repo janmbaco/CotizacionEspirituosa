@@ -19,37 +19,132 @@ document.write(
     '<script src="../js/bootstrap.js" type="text/javascript"></script>' +
     '<script src="../js/servidor.js" type="text/javascript" charset="utf-8"></script>');
 
+function EstaEnArray(Array, id) {
+    for (var i = 0; i < Array.length; i++)
+        if (Array[i].Id === id)
+            return true;
+    return false;
+}
 
 $("document").ready(function() {
-    setInterval(function() {
-        servidor.cotización.ListarCotización(function(bExito, rowsArray) {
+
+    //obtenemos el tipo de servicio por cada grupo de bebida
+    servidor.cotización.ListarGruposBebidaTiposServicio(
+        function(bExito, rowsArray) {
             if (!bExito) {
                 alert(rowsArray);
                 return;
             }
-            if(rowsArray.length === 0)
+            if (rowsArray.length === 0)
                 return;
-            if(rowsArray[0].length === 0)
+            if (rowsArray[0].length === 0)
                 return;
-            var Grupo = "";
-            var IG = 0, IB = 3, IP = 6;
-              $("#Id_Corp_Mitos").html("");
-            for (var i = 0; i < rowsArray.length; i++){
-               if(rowsArray[i][IG] !== Grupo){
-                   //añadimos un div
-                   $("#Id_Corp_Mitos").append(function(){
-                      return "<div id='Id_"+rowsArray[i][IG]+"' class='span2' ><table class='table'><caption>"+rowsArray[i][1]+"</caption></table></div>";
-                   });
-                   Grupo = rowsArray[i][IG];
-               } 
-               //en el div del grupo añadimo la bebida
-               $("#Id_"+rowsArray[i][IG]+" table").append(function(){
-                   return "<tr><td>"+rowsArray[i][IB]+"</td><td>"+rowsArray[i][IP]+"</td></tr>";
-               });
+            $("#Id_Corp_Mitos").html("");
+            var GrupoBebida = function() {
+                this.Id;
+                this.Nombre;
+                this.colspan;
+                this.Bebidas;
+                this.TiposServicio;
+            };
+            var Tipo = function() {
+                this.Id;
+                this.Nombre;
+            };
+            var ArrGruposBebida = [];
+            var Id_GB_Ant = -1, ID_TS_Ant = -2, ID_B_ANT = -1;
+            var iGB = -1, iB = 0, iTS = 0;
+            for (var i = 0; i < rowsArray.length; i++) {
+                if (rowsArray[i][0] !== Id_GB_Ant) {
+                    iGB++;
+                    ArrGruposBebida[iGB] = new GrupoBebida();
+                    ArrGruposBebida[iGB].Id = rowsArray[i][0];
+                    ArrGruposBebida[iGB].Nombre = rowsArray[i][1];
+                    iB = 0;
+                    iTS = 0;
+                    ArrGruposBebida[iGB].colspan = 2;
+                    ArrGruposBebida[iGB].TiposServicio = [];
+                    ArrGruposBebida[iGB].TiposServicio[iTS] = new Tipo();
+                    ArrGruposBebida[iGB].TiposServicio[iTS].Id = rowsArray[i][2];
+                    ArrGruposBebida[iGB].TiposServicio[iTS].Nombre = rowsArray[i][3];
+                    ArrGruposBebida[iGB].Bebidas = [];
+                    ArrGruposBebida[iGB].Bebidas[iB] = new Tipo();
+                    ArrGruposBebida[iGB].Bebidas[iB].Id = rowsArray[i][4];
+                    ArrGruposBebida[iGB].Bebidas[iB].Nombre = rowsArray[i][5];
+
+                } else {
+                    if (rowsArray[i][2] !== ID_TS_Ant) {
+                        //compruebo que no esté en el array de grupo de bebidas
+                        if (!EstaEnArray(ArrGruposBebida[iGB].TiposServicio, rowsArray[i][2])) {
+                            iTS++;
+                            ArrGruposBebida[iGB].colspan++;
+                            ArrGruposBebida[iGB].TiposServicio[iTS] = new Tipo();
+                            ArrGruposBebida[iGB].TiposServicio[iTS].Id = rowsArray[i][2];
+                            ArrGruposBebida[iGB].TiposServicio[iTS].Nombre = rowsArray[i][3];
+                        }
+
+                    }
+                    if (rowsArray[i][4] !== ID_B_ANT) {
+                        if (!EstaEnArray(ArrGruposBebida[iGB].Bebidas, rowsArray[i][4])) {
+                            iB++;
+                            ArrGruposBebida[iGB].Bebidas[iB] = new Tipo();
+                            ArrGruposBebida[iGB].Bebidas[iB].Id = rowsArray[i][4];
+                            ArrGruposBebida[iGB].Bebidas[iB].Nombre = rowsArray[i][5];
+                        }
+                    }
+                }
+                Id_GB_Ant = rowsArray[i][0];
+                ID_TS_Ant = rowsArray[i][2];
+                ID_B_ANT = rowsArray[i][4];
             }
-            
+            $("#Id_Corp_Mitos").append(function() {
+                var html = "";
+                //crear las tablas
+                for (var i = 0; i < ArrGruposBebida.length; i++) {
+                    //creo la tabla
+                    html += "<div id='Id_" + ArrGruposBebida[i].Id + "' class='span2' style='padding-bottom: 20px' ><table class='pizarra'>";
+                    html += "<tr><th id='Id_GB_" + ArrGruposBebida[i].Id + "_th' colspan=" + ArrGruposBebida[i].colspan + ">" + ArrGruposBebida[i].Nombre + "</th></tr>";
+
+                    html += "<tr><th></th>";
+                    for (var j = 0; j < ArrGruposBebida[i].TiposServicio.length; j++) {
+                        html += "<td>" + ArrGruposBebida[i].TiposServicio[j].Nombre + "</td>";
+                    }
+                    html += "</tr>";
+
+                    for (var j = 0; j < ArrGruposBebida[i].Bebidas.length; j++) {
+                        html += "<tr id='Id_B_" + ArrGruposBebida[i].Bebidas[j].Id + "' class='"+ (j % 2 ? "par": "impar") +"' > ";
+                        html += "<td>" + ArrGruposBebida[i].Bebidas[j].Nombre + "</td>";
+                        for (var k = 0; k < ArrGruposBebida[i].TiposServicio.length; k++) {
+                            html += "<td id='Id_B_" + ArrGruposBebida[i].Bebidas[j].Id + "_TS_" + ArrGruposBebida[i].TiposServicio[k].Id + "' ></td>";
+                        }
+                        html += "</tr>";
+                    }
+                    html += "</table></div>";
+                }
+
+                return html;
+            });
+            setInterval(function() {
+                servidor.cotización.ListarCotización(function(bExito, rowsArray) {
+                    if (!bExito) {
+                        // alert(rowsArray);
+                        return;
+                    }
+                    if (rowsArray.length === 0)
+                        return;
+                    if (rowsArray[0].length === 0)
+                        return;
+                    var IB = 2, IP = 6, p, IPI = 10, ITS = 4;
+                    for (var i = 0; i < rowsArray.length; i++) {
+                        if (rowsArray[i][IP] < rowsArray[i][IPI])
+                            $("#Id_B_" + rowsArray[i][IB]).addClass("barato");
+                        else
+                            $("#Id_B_" + rowsArray[i][IB]).removeClass("barato");
+                        $("#Id_B_" + rowsArray[i][IB] + "_TS_" + rowsArray[i][ITS]).html(Left((p = (p = rowsArray[i][IP].toString()) + (p.indexOf(".") > 0 ? '' : '.') + '00'), p.split(".")[0].length + 3) + "€");
+                    }
+                });
+            }, 1000);
         });
-    }, 1000);
 });
 
 

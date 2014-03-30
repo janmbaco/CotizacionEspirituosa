@@ -1,6 +1,6 @@
 {
   "name": "cotizacionespirituosa",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": false,
   "scripts": {
     "start": "node app.js"
@@ -10,12 +10,12 @@
     "jade": "*",
     "sqlite3": "~2.1.19",
     "bootstrap": "*",
-	"node-gyp" :"*"
+    "node-gyp": "*"
   },
   "description": "Cotización de bebidas alcoholicas en un bar atendiendo al consumo de una noche.",
   "main": "app.js",
   "author": "Jose Angel Navarro Martinez <janmbaco@gmail.com>",
-  "license": "BSD-2-Clause",
+  "license": "GPL",
   "keywords": [],
   "subdomain": "cotizacionespirituosa",
   "engines": {
@@ -27,5 +27,6 @@
   },
   "bugs": {
     "url": "https://github.com/janmbaco/CotizacionEspirituosa/issues"
-  }
+  },
+  "devDependencies": {}
 }

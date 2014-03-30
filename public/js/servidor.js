@@ -53,14 +53,17 @@ var servidor = (function() {
     return {
         cotización: (function() {
             return {
-                IniciarSesión: function(ArrayIdGruposBebida, EvResultado) {
-                    cmdAjax("cotización", "IniciarSesión", [ArrayIdGruposBebida], EvResultado);
+                IniciarSesión: function(Id_TPV, ArrayIdGruposBebida, EvResultado) {
+                    cmdAjax("cotización", "IniciarSesión", [Id_TPV, ArrayIdGruposBebida], EvResultado);
                 }
                 , ListarCotización: function(EvObtResultados) {
                     cmdAjax("cotización", "ListarCotización", [], EvObtResultados);
                 }
+                , ListarGruposBebidaTiposServicio: function(EvObtResultados) {
+                    cmdAjax("cotización", "ListarGruposBebidaTiposServicio", [], EvObtResultados);
+                }
                 , SesiónIniciada: function(EvObtResultados) {
-                    cmdAjax("cotización", "SesiónIniciada", [], EvObtResultados);
+                    cmdAjax("cotización", "SesiónIniciada", [Id_TPV], EvObtResultados);
                 }
                 , TiempoSesión: function(EvObtTiempoSesión) {
                     cmdAjax("cotización", "TiempoSesión", [], EvObtTiempoSesión);
@@ -169,7 +172,7 @@ var servidor = (function() {
                 };
 
             };
-            
+
             return {
                 AñadirTipoServicio: function(Nombre, Cantidad, Color, EvResultado) {
                     cmdAjax("servicios.TiposServicio", "Añadir", ["'" + Nombre + "'", Cantidad, Color], EvResultado);
@@ -371,6 +374,7 @@ var servidor = (function() {
                 this.Cantidad;
                 this.Color;
                 this.PrecioInicial;
+                this.PrecioCotizado;
                 this.Maximo;
                 this.Minimo;
                 this.Tramo;
@@ -379,12 +383,20 @@ var servidor = (function() {
                 this._parent;
                 //functiones
                 this.ObtenerPrecio = function(EvObtResultado) {
-                    cmdAjax("servicios.TiposServicio", "ObtenerPrecio", [this._parent.IdBebida, this.IdTipoServicio], 
-                    function(bExito, precio, self){
-                        if(precio === null) precio = self.PrecioInicial;
-                        if(!isUndefined(EvObtResultado))
-                            EvObtResultado(bExito, precio);
-                    }, this);
+                    cmdAjax("servicios.TiposServicio", "ObtenerPrecio", [this._parent.IdBebida, this.IdTipoServicio],
+                        function(bExito, precio, self) {
+                            if (!bExito) {
+                                if (!isUndefined(EvObtResultado))
+                                    EvObtResultado(bExito, precio);
+                                return;
+                            }
+                            if (precio === null)
+                                self.PrecioCotizado = self.PrecioInicial;
+                            else
+                                self.PrecioCotizado = precio;
+                            if (!isUndefined(EvObtResultado))
+                                EvObtResultado(bExito, self.PrecioCotizado);
+                        }, this);
                 };
                 this.FijarPrecio = function(Precio, EvResultado) {
                     cmdAjax("servicios.TiposServicio", "FijarPrecio", [this._parent.IdBebida, this.IdTipoServicio, Precio], EvResultado);
@@ -398,7 +410,20 @@ var servidor = (function() {
                             EvObtResultado(true, this);
                         return;
                     }
-                    cmdAjax("servicios.TiposServicio", "Cotizar", [this._parent.IdGrupoBebida, this._parent.IdBebida, this.IdTipoServicio, this._parent.RelacionInicial, this.PrecioInicial, this.Maximo, this.Minimo, this.Tramo], EvObtResultado);
+                    cmdAjax("servicios.TiposServicio", "Cotizar", [this._parent.IdGrupoBebida, this._parent.IdBebida, this.IdTipoServicio, this._parent.RelacionInicial, this.PrecioInicial, this.Maximo, this.Minimo, this.Tramo]
+                    , function(bExito, precio, self) {
+                            if (!bExito) {
+                                if (!isUndefined(EvObtResultado))
+                                    EvObtResultado(bExito, precio);
+                                return;
+                            }
+                            if (precio === null)
+                                self.PrecioCotizado = self.PrecioInicial;
+                            else
+                                self.PrecioCotizado = precio;
+                            if (!isUndefined(EvObtResultado))
+                                EvObtResultado(bExito, self.PrecioCotizado);
+                        }, this);
                 };
             };
             return {
@@ -448,7 +473,7 @@ var servidor = (function() {
                                 ArrayBebidas[i].Nombre = rowsArray[i][1];
                                 ArrayBebidas[i].IdGrupoBebida = parseInt(rowsArray[i][2], 10);
                                 ArrayBebidas[i].NombreGrupoBebida = rowsArray[i][3];
-                                ArrayBebidas[i].RelacionInicial = (bStock ? 1 / parseInt(rowsArray[i][5], 10) :  parseFloat(rowsArray[i][4]));
+                                ArrayBebidas[i].RelacionInicial = (bStock ? 1 / parseInt(rowsArray[i][5], 10) : parseFloat(rowsArray[i][4]));
                                 ArrayBebidas[i].Cantidad_Bebidas = parseInt(rowsArray[i][5], 10);
                                 ArrayBebidas[i].bTiposGenericos = rowsArray[i][6] == 1;
                                 ArrayBebidas[i].Color = new ColorUtils(rowsArray[i][7]);
@@ -476,7 +501,7 @@ var servidor = (function() {
                 , StockBebida: function(idBebida, EvObtResultado) {
                     cmdAjax("stock", "StockBebida", [idBebida], EvObtResultado);
                 }
-                , ReiniciarStock: function(EvResultado){
+                , ReiniciarStock: function(EvResultado) {
                     cmdAjax("stock", "ReiniciarStock", [], EvResultado);
                 }
                 , ModificarStockBebida: function(idBebida, Cantidad_Stock, EvResultado) {

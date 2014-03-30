@@ -37,6 +37,36 @@ CREATE TABLE Sesiones (
 , 	CHECK (Fin > Inicio)
 );
 
+CREATE TABLE TPV (
+    Id_TPV NUMERIC(3,0) PRIMARY KEY
+,   Nombre VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE Acciones (
+ 	Id_Sesion NUMERIC(5,0) NOT NULL REFERENCES
+		Sesiones(Id_Sesion) ON DELETE CASCADE
+					    ON UPDATE CASCADE
+,   Id_Accion NUMERIC(5,0) NOT NULL
+,   Tipo_Accion NUMERIC(2,0) NOT NULL
+,   Id_TPV NUMERIC(3,0) NOT NULL REFERENCES
+        TPV(Id_TPV) ON DELETE CASCADE
+                    ON UPDATE CASCADE
+,   PRIMARY KEY (Id_Sesion, Id_Accion)
+);
+
+CREATE TABLE Acciones_TPV(
+   	Id_Sesion NUMERIC(5,0) NOT NULL REFERENCES
+		Sesiones(Id_Sesion) ON DELETE CASCADE
+					    ON UPDATE CASCADE
+,   Id_Accion NUMERIC(5,0) NOT NULL REFERENCES
+        Acciones(Id_Accion) ON DELETE CASCADE
+                            ON UPDATE CASCADE
+,   Id_TPV NUMERIC(3,0) NOT NULL REFERENCES
+        TPV(Id_TPV) ON DELETE CASCADE
+                    ON UPDATE CASCADE
+,   PRIMARY KEY (Id_Sesion, Id_Accion, Id_TPV)
+);
+
 CREATE TABLE Bebidas_Sesiones(
 	Id_Sesion NUMERIC(5,0) NOT NULL REFERENCES
 		Sesiones(Id_Sesion) ON DELETE CASCADE
@@ -54,7 +84,9 @@ CREATE TABLE Servicios (
 					    ON UPDATE CASCADE
 ,	Id_Servicio NUMERIC(5,0) NOT NULL PRIMARY KEY
 , 	Fecha DATETIME NOT NULL
-,   TPV VARCHAR(20) NOT NULL
+,   Id_TPV NUMERIC(3,0) NOT NULL REFERENCES
+        TPV(Id_TPV) ON DELETE CASCADE
+                    ON UPDATE CASCADE
 );
 
 CREATE TABLE Ordenes (
