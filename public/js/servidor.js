@@ -53,8 +53,8 @@ var servidor = (function() {
     return {
         cotización: (function() {
             return {
-                IniciarSesión: function(Id_TPV, ArrayIdGruposBebida, EvResultado) {
-                    cmdAjax("cotización", "IniciarSesión", [Id_TPV, ArrayIdGruposBebida], EvResultado);
+                IniciarSesión: function(ArrayIdGruposBebida, EvResultado) {
+                    cmdAjax("cotización", "IniciarSesión", [ArrayIdGruposBebida], EvResultado);
                 }
                 , ListarCotización: function(EvObtResultados) {
                     cmdAjax("cotización", "ListarCotización", [], EvObtResultados);
@@ -63,7 +63,7 @@ var servidor = (function() {
                     cmdAjax("cotización", "ListarGruposBebidaTiposServicio", [], EvObtResultados);
                 }
                 , SesiónIniciada: function(EvObtResultados) {
-                    cmdAjax("cotización", "SesiónIniciada", [Id_TPV], EvObtResultados);
+                    cmdAjax("cotización", "SesiónIniciada", [], EvObtResultados);
                 }
                 , TiempoSesión: function(EvObtTiempoSesión) {
                     cmdAjax("cotización", "TiempoSesión", [], EvObtTiempoSesión);
