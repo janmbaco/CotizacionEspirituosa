@@ -10,7 +10,8 @@
     "jade": "*",
     "sqlite3": "*",
     "bootstrap": "*",
-    "node-gyp": "*"
+    "node-gyp": "*",
+    "connect": "*"
   },
   "description": "Cotización de bebidas alcoholicas en un bar atendiendo al consumo de una noche.",
   "main": "app.js",
