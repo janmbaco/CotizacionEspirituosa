@@ -25,7 +25,7 @@ var global = require('./lib/global')
 var app = express();
 
 // all environments
-app.set('port', process.env.PORT || 80);
+app.set('port', process.env.PORT || 8080);
 app.use(favicon(path.join(__dirname, 'public/images/favicon02.png')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
