@@ -102,7 +102,7 @@ $("document").ready(function() {
                 //crear las tablas
                 for (var i = 0; i < ArrGruposBebida.length; i++) {
                     //creo la tabla
-                    html += "<div id='Id_" + ArrGruposBebida[i].Id + "' class='span2' style='padding-bottom: 20px' ><table class='pizarra'>";
+                    html += "<div id='Id_" + ArrGruposBebida[i].Id + "' class='col-xs-2' style='padding-bottom: 20px' ><table class='pizarra'>";
                     html += "<tr><th id='Id_GB_" + ArrGruposBebida[i].Id + "_th' colspan=" + ArrGruposBebida[i].colspan + ">" + ArrGruposBebida[i].Nombre + "</th></tr>";
 
                     html += "<tr><th></th>";

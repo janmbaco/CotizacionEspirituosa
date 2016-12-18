@@ -1,0 +1,97 @@
+@font-face {
+
+font-family: segoesc;
+
+src: url("../images/SketchFlow Print.ttf") format('truetype');
+
+}
+body{
+    background-color: #88beff;
+    background: url(../images/fondo_bungalow.png) no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/fondo_bungalow.png', sizingMethod='scale');
+    -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/fondo_bungalow.png', sizingMethod='scale')";
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25); background-repeat: repeat-x; border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    color: blue;//#6dabdd; ///*#646464*/#0d0d0d;
+    padding: 5px;
+    font-size: 18px;
+    font-family: segoesc;
+}
+
+#Id_Cap_Mitos{
+    /*background-image: url("../images/logobungalow2.png");
+    background-repeat: no-repeat;
+    background-position-y: -5px;
+    background-position-x: 15px;
+    height: 100px;
+    padding: 0px;
+    text-align: center;
+    vertical-align: bottom;*/
+}
+
+.pizarra {
+    background-color: whitesmoke;
+    -khtml-opacity:.85; 
+    -moz-opacity:.85; 
+    -ms-filter:"alpha(opacity=85)";
+    filter:alpha(opacity=85);
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0.85);
+    opacity:.85;
+    border: 5px #d7d7d7 solid;
+    //border: 1px solid BORDER_COLOR;   /* if needed */
+    -webkit-border-radius: 10px;    /* for Safari */
+    -moz-border-radius: 10px;       /* for Firefox */
+    border-radius: 10px;
+}
+
+
+
+.pizarra th{
+    font-size: 25px;
+    font-weight: bold;
+    text-align: left;
+    padding: 13px;
+    text-decoration: underline;
+}  
+
+.pizarra td{
+    padding: 6px;
+    
+   
+}
+
+/*.pizarra tbody > tr > td:nth-child(even){
+    background-color: #5693c5;
+   // color: #d5d5d5;
+}*/
+.pizarra .par{
+   // background-color: #63a1d3;
+   // color: #d5d5d5;
+  // color: blue;
+}
+.pizarra .impar{
+   //    background-color: #70ade1;
+   // color: #d5d5d5;
+   //color: white; 
+}
+.pizarra td{
+    border-left:1px ridge #5d9bcc;
+   // border-top: 1px ridge #5d9bcc;
+}
+
+.contenedor{
+    padding-top: 12%;
+}
+
+.pizarra .barato{
+    color: red;
+    background-color: white;
+   
+}
+.pizarra .barato td {
+   
+     border-color: #ff9361;
+}

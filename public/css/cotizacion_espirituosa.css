@@ -1,10 +1,7 @@
-/*
-        Nuevo css
-        
-*/
-*{
-     -webkit-user-select: none;
-    -khtml-user-select: none;
+
+ *{
+    -webkit-user-select: none ;
+    -khtml-user-select: none ;
     -moz-user-select: none;
     -o-user-select: none;
     -ms-user-select: none;
@@ -15,24 +12,81 @@ body{
     //background-color: rgb(18,30,49);
     //color: #fff !important;
 }
-input{
-         -webkit-user-select: auto;
-    -khtml-user-select: auto;
-    -moz-user-select: auto;
-    -o-user-select: auto;
-    -ms-user-select: auto;
-    user-select: auto;
+
+.page-header {
+    background-color: #0088cc; 
+    min-height: 105px; 
+    background-image: url('../img/an.png');  
+    background-position: 50px; 
+    background-repeat: no-repeat;
+    padding:0px;
+    padding-bottom: 20px;
+    margin:0;
+
+
+}
+.cabecera{ 
+    position: relative;
+    top: 45px;
+    right: 15px;
+    width: 100%;
+    z-index:2;
+
+}
+
+.cabecera .usuario {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    padding: 5px;
+    background-color: #007ec1;
+    color: #EEE;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.panel{
+    padding-top: 30px;
+}
+.creditos{
+    position: fixed;
+    bottom: 0;
+    left:0;
+}
+
+.advertencia{
+    border-color: #ebccd1;
+    color: #a94442;
+   
+}
+.advertencia-cabecera{
+    background-color: #f2dede;
+    background-image: url("../img/warning.png");
+    background-position-x: 10px;
+    background-position-y: 10px;
+    background-size: 35px 35px;
+    background-repeat: no-repeat;
+    -webkit-border-top-left-radius: 4px;
+    -webkit-border-top-right-radius: 4px;
+    -moz-border-radius-topleft: 4px;
+    -moz-border-radius-topright: 4px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    padding-left: 55px;
+    
+}
+.advertencia-cuerpo h4{
+     line-height: 1.5 !important;
 }
 .mitabla {
 
-    /*padding: 2px;*/
-    line-height: 10px;
+    line-height: 20px;
     text-align: left;
     vertical-align: middle;
-    //min-width: 710px;
 }
-.mitabla caption, 
-.tabla_Grupo_Bebidas caption{
+
+.mitabla caption{
     text-align:left;
     font-size: 14pt;
     padding: 10px;
@@ -51,7 +105,7 @@ input{
     padding-top: 4px;
 }
 
-.mitabla thead{
+.mitabla th{
     text-align: center;
 }
 .mitabla tfoot{
@@ -60,122 +114,41 @@ input{
 .mitabla tfoot td{
     border: 0;
 }
-.tabla_bebidas{
-    line-height: 20px;
-    text-align: left;
-    vertical-align: middle;
-    min-width: 710px;
-    /*	border: 1pt solid #dddddd;*/
-}
 
-.tabla_bebidas td{
+#Id_Modal_FijarPrecio td {
     padding: 5px;
-    /*	border: 1pt solid #dddddd;*/
 }
 
-.in_tabla{
-    line-height: 10px;
+#Id_Tabla_Resumen_Servicio tfoot{
+    font-size: 14pt;
+    font-weight: bold;
     text-align: left;
-    vertical-align: middle;
-    font-size: 10pt;
-    border: 1px solid #dddddd;
-    border-top:0;
-    margin:0;
-    padding: 2px;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-
+    
 }
-.in_tabla caption{
-    font-size: 12pt;
-    cursor:pointer;
-    cursor:hand;
-    border: 1px solid #dddddd;
-    border-bottom:0;
-    -webkit-border-top-left-radius: 4px;
-    -webkit-border-top-right-radius: 4px;
-    -moz-border-radius-topleft: 4px;
-    -moz-border-radius-topright: 4px;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    margin: 0px;
-    padding: 20px;
-
-
-}
-
-.tabla_Grupo_Bebidas {
-    line-height: 20pt;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -o-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    min-width: 845px;
-}
-
-.tabla_Grupo_Bebidas td{
-    width: 100px;
-    border: 1px solid #dddddd;
-    padding: 5px;
-    padding-left: 35px;
-
-}
-
-.tabla_Grupo_Bebidas th{
-    width: 100px;
-}
-.cuadro_retales{
-    text-align: left;
-}
-
-.tabla_Grupo_Bebidas tbody > tr:nth-child(odd) > td,
-.tabla_Grupo_Bebidas tbody > tr:nth-child(odd) > th {
-    background-color: /*rgb(51,51,55);//*/#f9f9f9;
-}
-
-.tabla_Grupo_Bebidas tbody > tr:nth-child(even) > td,
-.tabla_Grupo_Bebidas tbody > tr:nth-child(even) > th {
-    //background-color: #444;//#f9f9f9;
-}
-
-.tabla_Grupo_Bebidas tbody tr:hover > td,
-.tabla_Grupo_Bebidas tbody tr:hover > th {
-    background-color: /*#4a4a4a;//*/#eaeaea;
-}
-.tabla_Grupo_Bebidas .numerico{
-    padding-left: 5px;
-    width: 60px;
-}
-
-.tabla_Grupo_Bebidas tbody tr:last-child td:first-child {
-
-    -webkit-border-bottom-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-    -moz-border-radius-bottomleft: 4px;
-}
-
-.tabla_Grupo_Bebidas tbody tr:last-child td:last-child{
-    -webkit-border-bottom-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-    -moz-border-radius-bottomright: 4px;
+#Id_Tabla_Resumen_Servicio tfoot td{
+padding-left: 15px;
 }
 
 .numerico{
-    text-align: right !important;
+    max-width: 70px;
+    text-align: right;
 }
-
 h1{
     text-align: center;
 }
 .tab-pane{
-    min-height: 425px;}
+    min-height: 425px;
+}
 
 .menu {
     line-height: 40px;
     display: none;
+}
+.menu a{
+    padding: 21px 15px !important;
+    font-size: 14px;
+    line-height: 1.5;
+    border-radius: 6px;
 }
 
 .bebidas{
@@ -184,6 +157,7 @@ h1{
     padding: 0px;
     margin: 5px;
     text-align: center;
+    white-space: normal;
 }
 .bebidas > div{
     width: 120px;
@@ -194,12 +168,14 @@ h1{
     font-size: 15pt; 
     font-weight: bold;
     padding: 0px;
+    line-height: 1.0;
 }
 .Precios{
-    text-align: left;
+   text-align: center;
     font-size: 9pt;
-    margin-left: 15px;
-    margin-right: 15px;
+    width: 100%;
+     /*margin-left: 15px;
+    margin-right: 15px;*/
     padding: 0px;
 }
 
@@ -208,46 +184,69 @@ h1{
     margin: 2px;
     padding: 2px;
 }
-.tabla_Iniciar_Sesion
-{
-    
-    min-width: 525px;
-    width: 525px;
+
+a.empleado{
+    padding: 5px;
+    margin: 5px;
+    width: 110px;
+    height: 110px;
+    vertical-align: middle;
+}
+a.empleado > div {
+    width: 100px;
+    height: 100px;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    font-size: 13pt; 
+    font-weight: bold;
+    padding: 0px;
+}
+.tecla, .tecla_atras, .tecla_tilde {
+    width:46px;
+    //height: 46px;
+}
+/*.tecla, .tecla_atras, .tecla_mayusculas, .tecla_minusculas{
+    min-width: 60px;
+    min-height: 60px;
+}*/
+/*.teclado_numerico{
+       padding-bottom:0px;
+    margin-bottom:0px; 
+}*/
+
+.tecla_mayusculas, .tecla_minusculas, .tecla_enter{
+    width: 138px;
 }
 
-.tabla_Iniciar_Sesion td label{
-    
-    font-size: 12pt;
-    
+.teclado_mayusculas{
+    display: none;
 }
 
-.tabla_Iniciar_Sesion > tfoot td{
-    border: 0;
-    text-align: right;
+#Id_Teclado{
+    position: fixed;
+    top: 0;
+    left: 0;
+    text-align: center;
+    z-index: 9999;
+    display:none;
 }
 
-#Id_Tabla_Resumen_Servicio {
-    width: 100%;
-    min-width: 400px;
- 
+#Id_Teclado .contenido{
+    position: relative;
+    width: 585px;
+    height: 260px;
+    text-align:justify;
+    padding: 15px;
+
 }
-#Id_Tabla_Resumen_Servicio tbody tr:nth-child(odd){
-    background-color:  #f9f9f9;
-}
-#Id_Tabla_Resumen_Servicio tbody tr:hover > td{
-    background-color: #eaeaea;
-}
-#Id_Tabla_Resumen_Servicio tbody tr:last-child{
-    border-bottom: 1px solid #dedede;
-    
-}
-#Id_Tabla_Resumen_Servicio tbody td{
-    font-size: 12pt;
-    line-height: 20pt;
+.tecla_espacio{
+    width: 414px;
 }
 
-#Id_Tabla_Resumen_Servicio tfoot td{
-    line-height: 40pt;
-    font-weight: bolder;
-    font-size: 14pt;
+.color{
+   width: 100px;
 }
+
+
+

@@ -1,20 +1,3 @@
-/*
- * Copyright (C) 2013 José Ángel Navarro Martínez (janmbaco@gmail.com)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 var servidor = (function() {
     var cmdAjax = function(paquete, funcion, param, EvResultado, self) {
         var url = (function() {
@@ -24,9 +7,10 @@ var servidor = (function() {
                 return window.location.origin + "/wsjson";
             }
         })();
-
-        $.getJSON(url
-            , (function() {
+        $.ajax({
+            url: url
+            , crossDomain: true
+            , data: (function() {
                 var p = [];
                 for (var i = 0; i < param.length; i++) {
                     if (isUndefined(param[i]) || param[i] === null || param[i] === "") {
@@ -35,26 +19,29 @@ var servidor = (function() {
                         p[i] = param[i];
                     }
                 }
-
                 return {paquete: paquete, funcion: funcion, param: p};
             })()
-            )
-            .success(function(data) {
+            , dataType: "json"
+            , xhrFields: {
+                withCredentials: true
+            }
+            , success: function(data) {
                 //abre recibido un objeto que sea bExito y rowsArray
                 if (!isUndefined(EvResultado))
                     EvResultado(data.bExito, data.rowsArray, self);
-            })
-            .error(function(jqXHR, textStatus, err) {
+            }
+            , error: function(jqXHR, textStatus, err) {
                 if (!isUndefined(EvResultado))
                     EvResultado(false, textStatus + '\n' + err, self);
-            });
+            }
 
+        });
     };
     return {
         cotización: (function() {
             return {
                 IniciarSesión: function(ArrayIdGruposBebida, EvResultado) {
-                    cmdAjax("cotización", "IniciarSesión", [ArrayIdGruposBebida], EvResultado);
+                    cmdAjax("cotización", "IniciarSesión", [localStorage[TPV], ArrayIdGruposBebida], EvResultado);
                 }
                 , ListarCotización: function(EvObtResultados) {
                     cmdAjax("cotización", "ListarCotización", [], EvObtResultados);
@@ -69,13 +56,16 @@ var servidor = (function() {
                     cmdAjax("cotización", "TiempoSesión", [], EvObtTiempoSesión);
                 }
                 , CerrarSesión: function(EvResultado) {
-                    cmdAjax("cotización", "CerrarSesión", [], EvResultado);
+                    cmdAjax("cotización", "CerrarSesión", [localStorage[TPV]], EvResultado);
                 }
                 , PausarSesión: function(EvResultado) {
                     cmdAjax("cotización", "PausarSesión", [], EvResultado);
                 }
                 , ReanudarSesión: function(EvResultado) {
                     cmdAjax("cotización", "ReanudarSesión", [], EvResultado);
+                }
+                , ComprobarCambios: function(EvResultado) {
+                    cmdAjax("cotización", "ComprobarCambios", [localStorage[TPV]], EvResultado);
                 }
             };
         })()
@@ -209,14 +199,16 @@ var servidor = (function() {
                 , AñadirServicio: function(ArrDatosServicio, EvResultado) {
                     cmdAjax("servicios.Servicio", "Añadir", [ArrDatosServicio], EvResultado);
                 }
-                , CDatoServicio: function(idOrden, idTipoServicio, nombreTipoServicio, idBebida, nombreBebida, precio) {
+                , CDatoServicio: function(idEmpleado, idOrden, idTipoServicio, nombreTipoServicio, idBebida, nombreBebida, cantidad, precio) {
+                    this.IdEmpleado = idEmpleado;
                     this.IdOrden = idOrden;
                     this.IdTipoServicio = idTipoServicio;
                     this.IdBebida = idBebida;
+                    this.Cantidad = cantidad;
                     this.Precio = precio;
                     this.NombreTipoServicio = nombreTipoServicio;
                     this.NombreBebida = nombreBebida;
-                    this.TPV = localStorage[TPV];
+                    this.Id_TPV = localStorage[TPV];
                     return this;
                 }
             };
@@ -337,6 +329,7 @@ var servidor = (function() {
                                 self.TiposServicio[i].Cantidad = parseInt(rowsArray[i][2], 10);
                                 self.TiposServicio[i].Color = new ColorUtils(rowsArray[i][3]);
                                 self.TiposServicio[i].PrecioInicial = parseFloat(rowsArray[i][4]);
+                                self.TiposServicio[i].PrecioCotizado = parseFloat(rowsArray[i][4]);
                                 self.TiposServicio[i].Maximo = parseFloat(rowsArray[i][5]);
                                 self.TiposServicio[i].Minimo = parseFloat(rowsArray[i][6]);
                                 self.TiposServicio[i].Tramo = parseFloat(rowsArray[i][7]);
@@ -380,6 +373,7 @@ var servidor = (function() {
                 this.Tramo;
                 this.EnCotización = true;
                 this.bACotizar = false;
+                this.PrecioFijado = false;
                 this._parent;
                 //functiones
                 this.ObtenerPrecio = function(EvObtResultado) {
@@ -399,10 +393,10 @@ var servidor = (function() {
                         }, this);
                 };
                 this.FijarPrecio = function(Precio, EvResultado) {
-                    cmdAjax("servicios.TiposServicio", "FijarPrecio", [this._parent.IdBebida, this.IdTipoServicio, Precio], EvResultado);
+                    cmdAjax("servicios.TiposServicio", "FijarPrecio", [localStorage[TPV], this._parent.IdBebida, this.IdTipoServicio, Precio], EvResultado);
                 };
                 this.LiberarPrecio = function(EvResultado) {
-                    cmdAjax("servicios.TiposServicio", "LiberarPrecio", [this._parent.IdBebida, this.IdTipoServicio], EvResultado);
+                    cmdAjax("servicios.TiposServicio", "LiberarPrecio", [localStorage[TPV], this._parent.IdBebida, this.IdTipoServicio], EvResultado);
                 };
                 this.Cotizar = function(EvObtResultado) {
                     if (!this.EnCotización) {
@@ -411,7 +405,7 @@ var servidor = (function() {
                         return;
                     }
                     cmdAjax("servicios.TiposServicio", "Cotizar", [this._parent.IdGrupoBebida, this._parent.IdBebida, this.IdTipoServicio, this._parent.RelacionInicial, this.PrecioInicial, this.Maximo, this.Minimo, this.Tramo]
-                    , function(bExito, precio, self) {
+                        , function(bExito, precio, self) {
                             if (!bExito) {
                                 if (!isUndefined(EvObtResultado))
                                     EvObtResultado(bExito, precio);
@@ -509,6 +503,103 @@ var servidor = (function() {
                 }
                 , ModificarStockBotellaBebida: function(idBebida, Cantidad_Botella, Cantidad_Stock, EvResultado) {
                     cmdAjax("stock", "ModificarStockBotellaBebida", [idBebida, Cantidad_Botella, Cantidad_Stock], EvResultado);
+                }
+            };
+        })()
+        , empleados: (function() {
+            var CEmpleado = function() {
+                this.Id_Empleado;
+                this.Nombre;
+                this.Id_Perfil;
+                this.NombrePerfil;
+
+                this.CambiarNombre = function(Nombre, EvResultado) {
+                    cmdAjax("empleados.Empleado", "CambiarNombre", [this.Id_Empleado, "'" + Nombre + "'"]
+                        , function(bExito, Mensaje, self) {
+                            if (!bExito) {
+                                if (!isUndefined(EvResultado))
+                                    EvResultado(bExito, ObjEmpleado);
+                                return;
+                            }
+                            self.Nombre = Nombre;
+                            if (!isUndefined(EvResultado))
+                                EvResultado(true, "");
+
+                        }, this);
+                };
+                this.CambiarContraseña = function(Password, EvResultado) {
+                    cmdAjax("empleados.Empleado", "CambiarContraseña", [this.Id_Empleado, "'" + Password + "'"], EvResultado);
+                };
+            };
+            return {
+                AutenticarEmpleado: function(Nombre, Password, EvResultado) {
+                    cmdAjax("empleados", "Autenticar", ["'" + Nombre + "'", "'" + Password + "'"]
+                        , function(bExito, objEmpleado) {
+                            if (!bExito) {
+                                if (!isUndefined(EvResultado))
+                                    EvResultado(bExito, objEmpleado);
+                                return;
+
+                            }
+                            var Empleado = new CEmpleado();
+                            Empleado.Id_Empleado = objEmpleado.Id_Empleado;
+                            Empleado.Nombre = objEmpleado.Nombre;
+                            Empleado.Id_Perfil = objEmpleado.Id_Perfil;
+                            Empleado.NombrePerfil = objEmpleado.NombrePerfil;
+                            if (!isUndefined(EvResultado)) {
+                                EvResultado(true, Empleado);
+                            }
+                        });
+                }
+                , ListarEmpleados: function(EvObtResultados) {
+                    cmdAjax("empleados", "ListarEmpleados", [], EvObtResultados);
+                }
+                , AñadirEmpleado: function(Nombre, Password, Id_Perfil, Color,  EvResultado) {
+                    cmdAjax("empleados", "AñadirEmpleado", ["'" + Nombre + "'", "'" + Password + "'", Id_Perfil, Color], EvResultado);
+                }
+                , ModificarEmpleado: function(Id_Empleado, Nombre, Id_Perfil, Color, EvResultado) {
+                    cmdAjax("empleados", "ModificarEmpleado", [Id_Empleado, "'" + Nombre + "'", Id_Perfil, Color], EvResultado);
+                }
+                , QuitarEmpleado: function(Id_Empleado, EvResultado) {
+                    cmdAjax("empleados", "QuitarEmpleado", [Id_Empleado], EvResultado);
+                }
+                , ListarPerfiles: function(EvResultado) {
+                    cmdAjax("empleados", "ListarPerfiles", [], EvResultado);
+                }
+                , CambiarContraseña: function(Id_Empleado, Password, EvResultado){
+                    cmdAjax("empleados.Empleado", "CambiarContraseña", [Id_Empleado, "'" + Password + "'"], EvResultado);
+                }
+            };
+        })()
+        , tpvs: (function() {
+            return{
+                AñadirTPV: function(Nombre, EvResultado) {
+                    cmdAjax("tpvs", "AñadirTPV", ["'" + Nombre + "'"], EvResultado);
+                }
+                , ModificarTPV: function(Id_TPV, Nombre, EvResultado) {
+                    cmdAjax("tpvs", "ModificarTPV", [Id_TPV, "'" + Nombre + "'"], EvResultado);
+                }
+                , QuitarTPV: function(Id_TPV, EvResultado) {
+                    cmdAjax("tpvs", "QuitarTPV", [Id_TPV], EvResultado);
+                }
+                , ListarTPV: function(EvObtResultados) {
+                    cmdAjax("tpvs", "ListarTPV", [], EvObtResultados);
+                }
+                , EstaRegistradoTPV: function(EvResultado) {
+                    cmdAjax("tpvs", "EstaRegistradoTPV", [], EvResultado);
+                }
+                , RegistrarActualizacion: function(EvResultado) {
+                    cmdAjax("tpvs", "RegistrarActualizacion", [localStorage[TPV]], EvResultado);
+                }
+            };
+        })()
+        , aplicación: (function() {
+            return{
+                VerificarContraseña: function(Password, EvResultado) {
+                    cmdAjax("aplicación", "VerificarContraseña", ["'" + Password + "'"], EvResultado);
+                }
+                , EmpleadoEnSesión: function(EvResultado) {
+                    cmdAjax("aplicación", "EmpleadoEnSesión", [], EvResultado);
                 }
             };
         })()
