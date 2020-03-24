@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <SchemaVersion>2.0</SchemaVersion>
+        <ProjectGuid>{e82af90b-a808-4d4a-ace9-9094d28ad394}</ProjectGuid>
+        <ProjectHome>.</ProjectHome>
+        <ProjectView>ShowAllFiles</ProjectView>
+        <StartupFile>app.js</StartupFile>
+        <WorkingDirectory>.</WorkingDirectory>
+        <OutputPath>.</OutputPath>
+        <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+        <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">16.0</VisualStudioVersion>
+        <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+    <ItemGroup>
+        <Content Include="package.json" />
+        <Content Include="Readme.md" />
+        <Content Include="app.js" />
+        <Content Include="basededatos\Readme.md" />
+        <Content Include="lib\cotización.js" />
+        <Content Include="lib\database.js" />
+        <Content Include="lib\empleados.js" />
+        <Content Include="lib\global.js" />
+        <Content Include="lib\propiedades.js" />
+        <Content Include="lib\servicios.js" />
+        <Content Include="lib\stock.js" />
+        <Content Include="lib\tpvs.js" />
+        <Content Include="public\index.html" />
+        <Content Include="routes\index.js" />
+        <Content Include="routes\user.js" />
+        <Content Include="views\index.jade" />
+        <Content Include="views\layout.jade" />
+        <Content Include="public\css\bootstrap-responsive.css" />
+        <Content Include="public\css\bootstrap-theme.css" />
+        <Content Include="public\css\bootstrap-theme.min.css" />
+        <Content Include="public\css\bootstrap.css" />
+        <Content Include="public\css\bootstrap.min.css" />
+        <Content Include="public\css\cotizacion_espirituosa.css" />
+        <Content Include="public\fonts\glyphicons-halflings-regular.svg" />
+        <Content Include="public\images\favicon.png" />
+        <Content Include="public\images\favicon02.png" />
+        <Content Include="public\images\favicon.ico" />
+        <Content Include="public\img\an.png" />
+        <Content Include="public\img\fondo_imagen.png" />
+        <Content Include="public\img\glyphicons-halflings-white.png" />
+        <Content Include="public\img\glyphicons-halflings.png" />
+        <Content Include="public\img\hs.png" />
+        <Content Include="public\img\hv.png" />
+        <Content Include="public\img\warning.png" />
+        <Content Include="public\img\arrow.gif" />
+        <Content Include="public\img\cross.gif" />
+        <Content Include="public\js\bootstrap.js" />
+        <Content Include="public\js\bootstrap.min.js" />
+        <Content Include="public\js\global.js" />
+        <Content Include="public\js\jquery.js" />
+        <Content Include="public\js\jscolor.js" />
+        <Content Include="public\js\main.js" />
+        <Content Include="public\js\servidor.js" />
+        <Content Include="public\stylesheets\style.css" />
+        <Content Include="public\visor\bungalow.html" />
+        <Content Include="public\visor\index.html" />
+        <Content Include="public\visor\mitos.html" />
+        <Content Include="public\visor\css\bungalow.css" />
+        <Content Include="public\visor\css\mitos.css" />
+        <Content Include="public\visor\images\fondo_bungalow.png" />
+        <Content Include="public\visor\images\logo.png" />
+        <Content Include="public\visor\images\logobungalow.png" />
+        <Content Include="public\visor\images\logobungalow2.png" />
+        <Content Include="public\visor\js\bungalow.js" />
+        <Content Include="public\visor\js\bungalow.min.js" />
+        <Content Include="public\visor\js\main.js" />
+        <Content Include="public\visor\js\main.min.js" />
+        <Content Include="public\visor\js\mitos.js" />
+        <Content Include="public\visor\js\mitos.min.js" />
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="arch" />
+        <Folder Include="basededatos" />
+        <Folder Include="CotizacionEspirituosa" />
+        <Folder Include="lib" />
+        <Folder Include="public" />
+        <Folder Include="public\css" />
+        <Folder Include="public\fonts" />
+        <Folder Include="public\images" />
+        <Folder Include="public\img" />
+        <Folder Include="public\js" />
+        <Folder Include="public\stylesheets" />
+        <Folder Include="public\visor" />
+        <Folder Include="public\visor\css" />
+        <Folder Include="public\visor\images" />
+        <Folder Include="public\visor\js" />
+        <Folder Include="routes" />
+        <Folder Include="views" />
+    </ItemGroup>
+    <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+    <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
+    <ProjectExtensions>
+        <VisualStudio>
+          <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+            <WebProjectProperties>
+              <UseIIS>False</UseIIS>
+              <AutoAssignPort>True</AutoAssignPort>
+              <DevelopmentServerPort>0</DevelopmentServerPort>
+              <DevelopmentServerVPath>/</DevelopmentServerVPath>
+              <IISUrl>http://localhost:48022/</IISUrl>
+              <NTLMAuthentication>False</NTLMAuthentication>
+              <UseCustomServer>True</UseCustomServer>
+              <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+              <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+            </WebProjectProperties>
+          </FlavorProperties>
+          <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+            <WebProjectProperties>
+              <StartPageUrl>
+              </StartPageUrl>
+              <StartAction>CurrentPage</StartAction>
+              <AspNetDebugging>True</AspNetDebugging>
+              <SilverlightDebugging>False</SilverlightDebugging>
+              <NativeDebugging>False</NativeDebugging>
+              <SQLDebugging>False</SQLDebugging>
+              <ExternalProgram>
+              </ExternalProgram>
+              <StartExternalURL>
+              </StartExternalURL>
+              <StartCmdLineArguments>
+              </StartCmdLineArguments>
+              <StartWorkingDirectory>
+              </StartWorkingDirectory>
+              <EnableENC>False</EnableENC>
+              <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+            </WebProjectProperties>
+          </FlavorProperties>
+        </VisualStudio>
+    </ProjectExtensions>
+</Project>
