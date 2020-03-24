@@ -27,3 +27,6 @@ node_modules
 *.suo
 /.vs
 *.user
+*.dll
+*.cache
+/obj/Debug/CotizacionEspirituosa.njsproj.FileListAbsolute.txt
