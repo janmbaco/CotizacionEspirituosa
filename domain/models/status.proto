@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package domain.models;
+
+message StatusResponse{
+    string status = 1;
+}
+
+message StatusRequest{
+}

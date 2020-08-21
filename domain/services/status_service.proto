@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package domain.services;
+
+import "github.com/janmbaco/CotizacionEspirituosa/domain/models/status.proto";
+
+service StatusService{
+    rpc GetStatus ( domain.models.StatusRequest ) returns (domain.models.StatusResponse) {}
+}
