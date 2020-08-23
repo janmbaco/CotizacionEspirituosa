@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "grpc_api/domain/models";
+option go_package = "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models";
 
 package domain.models;
 

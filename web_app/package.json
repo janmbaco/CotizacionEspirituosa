@@ -7,7 +7,8 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "generate:domain": "protoc domain/models/status.proto  domain/services/status_service.proto  --js_out=\"import_style=commonjs,binary:.\" --plugin=\"protoc-gen-ts=.\\node_modules\\.bin\\protoc-gen-ts.cmd\" --ts_out=\"service=grpc-web:.\" --proto_path=\"..\""
   },
   "private": true,
   "dependencies": {
@@ -19,7 +20,11 @@
     "@angular/platform-browser": "~10.0.6",
     "@angular/platform-browser-dynamic": "~10.0.6",
     "@angular/router": "~10.0.6",
+    "@improbable-eng/grpc-web": "^0.13.0",
+    "@types/google-protobuf": "^3.7.3",
+    "google-protobuf": "^3.13.0",
     "rxjs": "~6.5.5",
+    "ts-protoc-gen": "^0.12.0",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.3"
   },
