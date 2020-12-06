@@ -12,11 +12,11 @@ type AbstractsServer struct {
 	*ps.UnimplementedAbstractServer
 	*BaseServer
 	actions *abstracts.Actions
-	entity  *abstracts.Entity
+	entity  abstracts.Entity
 }
 
 func (s *AbstractsServer) Get(_ *pb.NullRequest, stream ps.Abstract_GetServer) error {
-	s.subscribeReceiver(s.entity, common.NewReceiver(stream))
+	common.NewStateSender(s.store, s.entity, stream).Initialize()
 	return nil
 }
 

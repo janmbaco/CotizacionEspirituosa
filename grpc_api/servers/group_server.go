@@ -12,11 +12,11 @@ type GroupServer struct {
 	*ps.UnimplementedGroupServer
 	*BaseServer
 	actions *groups.Actions
-	entity  *groups.Entity
+	entity  groups.Entity
 }
 
 func (s *GroupServer) Get(_ *pb.NullRequest, stream ps.Delivery_GetServer) error {
-	s.subscribeReceiver(s.entity, common.NewReceiver(stream))
+	common.NewStateSender(s.store, s.entity, stream).Initialize()
 	return nil
 }
 

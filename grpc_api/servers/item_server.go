@@ -12,11 +12,11 @@ type ItemServer struct {
 	*ps.UnimplementedItemServer
 	*BaseServer
 	actions *items.Actions
-	entity  *items.Entity
+	entity  items.Entity
 }
 
 func (s *ItemServer) Get(_ *pb.NullRequest, stream ps.Item_GetServer) error {
-	s.subscribeReceiver(s.entity, common.NewReceiver(stream))
+	common.NewStateSender(s.store, s.entity, stream).Initialize()
 	return nil
 }
 

@@ -12,11 +12,11 @@ type DeliveryServer struct {
 	*ps.UnimplementedDeliveryServer
 	*BaseServer
 	actions *deliveries.Actions
-	entity  *deliveries.Entity
+	entity  deliveries.Entity
 }
 
 func (s *DeliveryServer) Get(_ *pb.NullRequest, stream ps.Delivery_GetServer) error {
-	s.subscribeReceiver(s.entity, common.NewReceiver(stream))
+	common.NewStateSender(s.store, s.entity, stream).Initialize()
 	return nil
 }
 

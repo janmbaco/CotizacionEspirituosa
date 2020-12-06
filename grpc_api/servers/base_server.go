@@ -1,7 +1,6 @@
 package servers
 
 import (
-	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/core/common"
 	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models"
 	"github.com/janmbaco/go-infrastructure/errorhandler"
 	redux "github.com/janmbaco/go-redux/core"
@@ -20,8 +19,4 @@ func (this *BaseServer) tryStoreDispatch(action redux.Action) *models.ResultResp
 		result.ErrorMessage = err.Error()
 	})
 	return result
-}
-
-func (this *BaseServer) subscribeReceiver(entity redux.StateEntity, receiver common.Receiver) {
-	this.store.Subscribe(entity, receiver.Receive)
 }

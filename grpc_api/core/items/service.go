@@ -6,7 +6,7 @@ import (
 
 type Service interface {
 	Get() *pb.Items
-	Set(state *pb.Items, item *pb.Item) *pb.Items
+	Set(state *pb.Items, item *pb.Item) *pb.Item
 	Remove(state *pb.Items, item *pb.Item) *pb.Items
 }
 
@@ -20,10 +20,9 @@ func NewService(repository Repository) *service {
 }
 
 func (this *service) Get() *pb.Items {
+	all := func(a *pb.Item) {}
 	return &pb.Items{
-		Items: this.repository.Select(func(a *pb.Item) bool {
-			return true
-		}),
+		Items: this.repository.Select(all),
 	}
 }
 
@@ -32,9 +31,9 @@ func (this *service) Set(state *pb.Items, item *pb.Item) *pb.Items {
 		item = this.repository.Insert(item)
 		state.Items = append(state.Items, item)
 	} else {
-		itemsModifieds := this.repository.Update(item, func(a *pb.Item) bool {
-			return a.Id == item.Id
-		})
+		where := func(a *pb.Item) { a.Id = item.Id }
+		update := func(a *pb.Item) { a = item }
+		itemsModifieds := this.repository.Update(update, where)
 		for _, a := range itemsModifieds {
 			for _, aState := range state.Items {
 				if a.Id == aState.Id {
@@ -52,10 +51,8 @@ func (this *service) Remove(state *pb.Items, item *pb.Item) *pb.Items {
 		panic("This item not exists in the repository!")
 	}
 	this.events.RemovingItem(item)
-	this.repository.Delete(func(a *pb.Item) bool {
-		return a.Id == item.Id
-	})
-
+	where := func(a *pb.Item) { a.Id = item.Id }
+	this.repository.Delete(where)
 	newState := make([]*pb.Item, 0)
 	for _, aState := range state.Items {
 		if item.Id != aState.Id {

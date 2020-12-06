@@ -12,11 +12,11 @@ type FamilyServer struct {
 	*ps.UnimplementedFamilyServer
 	*BaseServer
 	actions *families.Actions
-	entity  *families.Entity
+	entity  families.Entity
 }
 
 func (s *FamilyServer) Get(_ *pb.NullRequest, stream ps.Family_GetServer) error {
-	s.subscribeReceiver(s.entity, common.NewReceiver(stream))
+	common.NewStateSender(s.store, s.entity, stream).Initialize()
 	return nil
 }
 

@@ -6,7 +6,7 @@ import (
 
 type Service interface {
 	Get() *pb.Deliveries
-	Set(state *pb.Deliveries, delivery *pb.Delivery) *pb.Deliveries
+	Set(state *pb.Deliveries, delivery *pb.Delivery) *pb.Delivery
 	Remove(state *pb.Deliveries, delivery *pb.Delivery) *pb.Deliveries
 }
 
@@ -20,10 +20,9 @@ func NewService(repository Repository) *service {
 }
 
 func (this *service) Get() *pb.Deliveries {
+	all := func(a *pb.Delivery) {}
 	return &pb.Deliveries{
-		Deliveries: this.repository.Select(func(a *pb.Delivery) bool {
-			return true
-		}),
+		Deliveries: this.repository.Select(all),
 	}
 }
 
@@ -32,13 +31,13 @@ func (this *service) Set(state *pb.Deliveries, delivery *pb.Delivery) *pb.Delive
 		delivery = this.repository.Insert(delivery)
 		state.Deliveries = append(state.Deliveries, delivery)
 	} else {
-		deliveriesModifieds := this.repository.Update(delivery, func(a *pb.Delivery) bool {
-			return a.Id == delivery.Id
-		})
-		for _, a := range deliveriesModifieds {
+		where := func(a *pb.Delivery) { a.Id = delivery.Id }
+		update := func(a *pb.Delivery) { a = delivery }
+		deliverysModifieds := this.repository.Update(update, where)
+		for _, a := range deliverysModifieds {
 			for _, aState := range state.Deliveries {
 				if a.Id == aState.Id {
-					delivery = a
+					aState = a
 				}
 			}
 		}
@@ -52,10 +51,8 @@ func (this *service) Remove(state *pb.Deliveries, delivery *pb.Delivery) *pb.Del
 		panic("This delivery not exists in the repository!")
 	}
 	this.events.RemovingDelivery(delivery)
-	this.repository.Delete(func(a *pb.Delivery) bool {
-		return a.Id == delivery.Id
-	})
-
+	where := func(a *pb.Delivery) { a.Id = delivery.Id }
+	this.repository.Delete(where)
 	newState := make([]*pb.Delivery, 0)
 	for _, aState := range state.Deliveries {
 		if delivery.Id != aState.Id {

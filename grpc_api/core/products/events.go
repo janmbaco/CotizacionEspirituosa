@@ -13,11 +13,11 @@ type Events interface {
 const productEvents = "productEvents"
 
 type events struct {
-	publisher events2.EventPublisher
+	publisher events2.Publisher
 	product   *pb.Product
 }
 
-func NewEvents(publisher events2.EventPublisher) *events {
+func NewEvents(publisher events2.Publisher) *events {
 	return &events{publisher: publisher}
 }
 

@@ -20,10 +20,9 @@ func NewService(repository Repository) *service {
 }
 
 func (this *service) Get() *pb.Abstracts {
+	all := func(a *pb.Abstract) {}
 	return &pb.Abstracts{
-		Abstracts: this.repository.Select(func(a *pb.Abstract) bool {
-			return true
-		}),
+		Abstracts: this.repository.Select(all),
 	}
 }
 
@@ -32,13 +31,13 @@ func (this *service) Set(state *pb.Abstracts, abstract *pb.Abstract) *pb.Abstrac
 		abstract = this.repository.Insert(abstract)
 		state.Abstracts = append(state.Abstracts, abstract)
 	} else {
-		abstractsModifieds := this.repository.Update(abstract.Name, func(a *pb.Abstract) bool {
-			return a.Id == abstract.Id
-		})
+		where := func(a *pb.Abstract) { a.Id = abstract.Id }
+		update := func(a *pb.Abstract) { a = abstract }
+		abstractsModifieds := this.repository.Update(update, where)
 		for _, a := range abstractsModifieds {
 			for _, aState := range state.Abstracts {
 				if a.Id == aState.Id {
-					aState.Name = a.Name
+					aState = a
 				}
 			}
 		}
@@ -52,10 +51,8 @@ func (this *service) Remove(state *pb.Abstracts, abstract *pb.Abstract) *pb.Abst
 		panic("This abstract not exists in the repository!")
 	}
 	this.events.RemovingAbstract(abstract)
-	this.repository.Delete(func(a *pb.Abstract) bool {
-		return a.Id == abstract.Id
-	})
-
+	where := func(a *pb.Abstract) { a.Id = abstract.Id }
+	this.repository.Delete(where)
 	newState := make([]*pb.Abstract, 0)
 	for _, aState := range state.Abstracts {
 		if abstract.Id != aState.Id {

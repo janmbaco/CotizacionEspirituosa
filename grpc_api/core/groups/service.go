@@ -5,9 +5,9 @@ import (
 )
 
 type Service interface {
-	Get() []*pb.Group
-	Set(groups *pb.Groups, group *pb.Group) *pb.Groups
-	Remove(groups []*pb.Groups, group *pb.Group) []*pb.Groups
+	Get() *pb.Groups
+	Set(state *pb.Groups, group *pb.Group) *pb.Group
+	Remove(state *pb.Groups, group *pb.Group) *pb.Groups
 }
 
 type service struct {
@@ -19,31 +19,31 @@ func NewService(repository Repository) *service {
 	return &service{repository: repository}
 }
 
-func (this *service) Get() []*pb.Group {
-	return this.repository.Select(func(a *pb.Group) bool {
-		return true
-	})
+func (this *service) Get() *pb.Groups {
+	all := func(a *pb.Group) {}
+	return &pb.Groups{
+		Groups: this.repository.Select(all),
+	}
 }
 
-func (this *service) Set(groups *pb.Groups, group *pb.Group) *pb.Groups {
+func (this *service) Set(state *pb.Groups, group *pb.Group) *pb.Groups {
 	if group.Id == 0 {
 		group = this.repository.Insert(group)
-		groups.Groups = append(groups.Groups, group)
+		state.Groups = append(state.Groups, group)
 	} else {
-		groupsModfieds := this.repository.Update(group, func(a *pb.Group) bool {
-			return a.Id == group.Id
-		})
-		for _, g := range groupsModfieds {
-			for _, gState := range groups.Groups {
-				if g.Id == gState.Id {
-					gState = g
-					this.events.ChangedGroup(g)
+		where := func(a *pb.Group) { a.Id = group.Id }
+		update := func(a *pb.Group) { a = group }
+		groupsModifieds := this.repository.Update(update, where)
+		for _, a := range groupsModifieds {
+			for _, aState := range state.Groups {
+				if a.Id == aState.Id {
+					aState.Name = a.Name
 				}
 			}
 		}
 	}
 
-	return groups
+	return state
 }
 
 func (this *service) Remove(state *pb.Groups, group *pb.Group) *pb.Groups {
@@ -51,17 +51,14 @@ func (this *service) Remove(state *pb.Groups, group *pb.Group) *pb.Groups {
 		panic("This group not exists in the repository!")
 	}
 	this.events.RemovingGroup(group)
-	this.repository.Delete(func(a *pb.Group) bool {
-		return a.Id == group.Id
-	})
-
+	where := func(a *pb.Group) { a.Id = group.Id }
+	this.repository.Delete(where)
 	newState := make([]*pb.Group, 0)
-	for _, gState := range state.Groups {
-		if group.Id != gState.Id {
-			newState = append(newState, gState)
+	for _, aState := range state.Groups {
+		if group.Id != aState.Id {
+			newState = append(newState, aState)
 		}
 	}
 	state.Groups = newState
-
 	return state
 }

@@ -13,11 +13,11 @@ type Events interface {
 const abstractEvents = "abstractEvents"
 
 type events struct {
-	publisher events2.EventPublisher
+	publisher events2.Publisher
 	abstract  *pb.Abstract
 }
 
-func NewEvents(publisher events2.EventPublisher) *events {
+func NewEvents(publisher events2.Publisher) *events {
 	return &events{publisher: publisher}
 }
 

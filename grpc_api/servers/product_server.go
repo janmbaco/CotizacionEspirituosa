@@ -12,11 +12,11 @@ type ProductServer struct {
 	*ps.UnimplementedProductServer
 	*BaseServer
 	actions *products.Actions
-	entity  *products.Entity
+	entity  products.Entity
 }
 
 func (s *ProductServer) Get(_ *pb.NullRequest, stream ps.Product_GetServer) error {
-	s.subscribeReceiver(s.entity, common.NewReceiver(stream))
+	common.NewStateSender(s.store, s.entity, stream).Initialize()
 	return nil
 }
 

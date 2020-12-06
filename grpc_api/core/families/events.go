@@ -6,18 +6,18 @@ import (
 )
 
 type Events interface {
-	RemovingAbstract(family *pb.Family)
+	RemovingFamily(family *pb.Family)
 	Subscribe(fn func(family *pb.Family))
 }
 
 const familyEvents = "familyEvents"
 
 type events struct {
-	publisher events2.EventPublisher
+	publisher events2.Publisher
 	family    *pb.Family
 }
 
-func NewEvents(publisher events2.EventPublisher) *events {
+func NewEvents(publisher events2.Publisher) *events {
 	return &events{publisher: publisher}
 }
 
@@ -27,7 +27,7 @@ func (e *events) Subscribe(fn func(family *pb.Family)) {
 	})
 }
 
-func (e *events) RemovingAbstract(family *pb.Family) {
+func (e *events) RemovingFamily(family *pb.Family) {
 	e.family = family
 	e.publisher.Publish(familyEvents)
 }
