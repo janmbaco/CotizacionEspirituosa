@@ -4,9 +4,12 @@ option go_package = "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/m
 
 package domain.models;
 
-message StatusResponse{
-    string status = 1;
+message Product {
+    uint32 id = 1;
+    uint32 family = 2;
+    string name = 3;
 }
 
-message StatusRequest{
+message Products {
+    repeated Product products  = 1;
 }

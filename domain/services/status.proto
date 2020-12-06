@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option go_package = "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/services";
+
+package domain.services;
+
+import "domain/models/request.proto";
+import "domain/models/response.proto";
+
+service Status {
+
+    rpc Get ( domain.models.NullRequest ) returns ( domain.models.ResultResponse ) {}
+
+}

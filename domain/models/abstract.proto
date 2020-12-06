@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package = "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models";
+
+package domain.models;
+
+message Abstract {
+    uint32 id = 1;
+    string name = 2;
+}
+
+message Abstracts {
+    repeated Abstract abstracts = 1;
+}
+

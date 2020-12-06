@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models";
+
+package domain.models;
+
+message Group {
+    uint32 id = 1;
+    uint32 abstract = 2;
+    string name = 3;
+    float basePrice = 4;
+    float priceStep = 5;
+    float minPrice = 6;
+    float maxPrice = 7;
+}
+
+message Groups {
+    repeated Group groups = 1;
+}

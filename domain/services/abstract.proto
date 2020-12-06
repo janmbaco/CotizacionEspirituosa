@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option go_package = "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/services";
+
+package domain.services;
+
+import "domain/models/abstract.proto";
+import "domain/models/request.proto";
+import "domain/models/response.proto";
+
+service Abstract {
+
+    rpc Set( domain.models.Abstract )  returns ( domain.models.ResultResponse  ) {}
+
+    rpc Get( domain.models.NullRequest )  returns ( stream domain.models.Abstracts ) {}
+
+    rpc Remove( domain.models.Abstract )  returns ( domain.models.ResultResponse  ) {}
+
+}
+

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package = "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models";
+
+package domain.models;
+
+enum Result {
+    OK = 0;
+    KO = 1;
+}
+
+message ResultResponse {
+    Result Result = 1;
+    string ErrorMessage = 2;
+}

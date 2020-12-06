@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package = "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models";
+
+package domain.models;
+
+message Consume {
+    uint32 delivery = 1;
+    int64 date = 2;
+    float price = 3;
+}
+
+message Consumes {
+    repeated Consume consumes = 1;
+}

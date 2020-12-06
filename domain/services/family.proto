@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/services";
+
+package domain.services;
+
+import "domain/models/family.proto";
+import "domain/models/request.proto";
+import "domain/models/response.proto";
+
+service Family{
+
+    rpc Set( domain.models.Family )  returns ( domain.models.ResultResponse ) {}
+
+    rpc Get( domain.models.NullRequest )  returns ( stream domain.models.Families ) {}
+
+    rpc Remove( domain.models.Family )  returns ( domain.models.ResultResponse  ) {}
+    
+}

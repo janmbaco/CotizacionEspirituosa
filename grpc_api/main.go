@@ -2,14 +2,15 @@ package main
 
 import (
 	"flag"
-	"google.golang.org/grpc"
 	"os"
 
+	"google.golang.org/grpc"
+
 	ps "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/services"
-	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/impls"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/servers"
 	"github.com/janmbaco/go-infrastructure/config"
 	"github.com/janmbaco/go-infrastructure/server"
-    _ "github.com/jnewmano/grpc-json-proxy/codec"
+	_ "github.com/jnewmano/grpc-json-proxy/codec"
 )
 
 type Config struct {
@@ -28,6 +29,7 @@ func main() {
 		serverSetter.ServerType = server.GRpcSever
 		serverSetter.Addr = conf.Port
 	}).SetProtobuf(func(grpcServer *grpc.Server) {
-		ps.RegisterStatusServiceServer(grpcServer, &impls.StatusService{})
+		ps.RegisterStatusServer(grpcServer, &servers.StatusService{})
+
 	}).Start()
 }

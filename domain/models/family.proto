@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option go_package = "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models";
+
+package domain.models;
+
+message Family {
+    uint32 id = 1;
+    string name = 2;
+}
+
+message Families {
+    repeated Family families = 1;
+}
