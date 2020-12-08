@@ -8,6 +8,7 @@ type Service interface {
 	Get() *pb.Groups
 	Set(state *pb.Groups, group *pb.Group) *pb.Group
 	Remove(state *pb.Groups, group *pb.Group) *pb.Groups
+	RemoveByAbstract(state *pb.Groups, abstract *pb.Abstract) *pb.Groups
 }
 
 type service struct {
@@ -20,9 +21,8 @@ func NewService(repository Repository) *service {
 }
 
 func (this *service) Get() *pb.Groups {
-	all := func(a *pb.Group) {}
 	return &pb.Groups{
-		Groups: this.repository.Select(all),
+		Groups: this.repository.Select(&pb.Group{}),
 	}
 }
 
@@ -31,16 +31,7 @@ func (this *service) Set(state *pb.Groups, group *pb.Group) *pb.Groups {
 		group = this.repository.Insert(group)
 		state.Groups = append(state.Groups, group)
 	} else {
-		where := func(a *pb.Group) { a.Id = group.Id }
-		update := func(a *pb.Group) { a = group }
-		groupsModifieds := this.repository.Update(update, where)
-		for _, a := range groupsModifieds {
-			for _, aState := range state.Groups {
-				if a.Id == aState.Id {
-					aState.Name = a.Name
-				}
-			}
-		}
+		state = newState(state, this.repository.Update(&pb.Group{Id: group.Id}, group), true)
 	}
 
 	return state
@@ -50,15 +41,24 @@ func (this *service) Remove(state *pb.Groups, group *pb.Group) *pb.Groups {
 	if group.Id == 0 {
 		panic("This group not exists in the repository!")
 	}
-	this.events.RemovingGroup(group)
-	where := func(a *pb.Group) { a.Id = group.Id }
-	this.repository.Delete(where)
-	newState := make([]*pb.Group, 0)
-	for _, aState := range state.Groups {
-		if group.Id != aState.Id {
-			newState = append(newState, aState)
+
+	if cancel := this.events.RemovingGroup(group); cancel {
+		panic("Deletion was canceled through an event!")
+	}
+
+	return newState(state, this.repository.Delete(&pb.Group{Id: group.Id}), false)
+}
+func (this *service) RemoveByAbstract(state *pb.Groups, abstract *pb.Abstract) *pb.Groups {
+	if abstract.Id == 0 {
+		panic("This abstract not exists in the repository!")
+	}
+
+	filter := &pb.Group{Abstract: abstract.Id}
+	for _, group := range this.repository.Select(filter) {
+		if cancel := this.events.RemovingGroup(group); cancel {
+			panic("Deletion was canceled through an event!")
 		}
 	}
-	state.Groups = newState
-	return state
+
+	return newState(state, this.repository.Delete(filter), false)
 }

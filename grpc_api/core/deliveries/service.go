@@ -8,6 +8,7 @@ type Service interface {
 	Get() *pb.Deliveries
 	Set(state *pb.Deliveries, delivery *pb.Delivery) *pb.Delivery
 	Remove(state *pb.Deliveries, delivery *pb.Delivery) *pb.Deliveries
+	RemoveByGroup(state *pb.Deliveries, group *pb.Group) *pb.Deliveries
 }
 
 type service struct {
@@ -20,9 +21,8 @@ func NewService(repository Repository) *service {
 }
 
 func (this *service) Get() *pb.Deliveries {
-	all := func(a *pb.Delivery) {}
 	return &pb.Deliveries{
-		Deliveries: this.repository.Select(all),
+		Deliveries: this.repository.Select(&pb.Delivery{}),
 	}
 }
 
@@ -31,16 +31,7 @@ func (this *service) Set(state *pb.Deliveries, delivery *pb.Delivery) *pb.Delive
 		delivery = this.repository.Insert(delivery)
 		state.Deliveries = append(state.Deliveries, delivery)
 	} else {
-		where := func(a *pb.Delivery) { a.Id = delivery.Id }
-		update := func(a *pb.Delivery) { a = delivery }
-		deliverysModifieds := this.repository.Update(update, where)
-		for _, a := range deliverysModifieds {
-			for _, aState := range state.Deliveries {
-				if a.Id == aState.Id {
-					aState = a
-				}
-			}
-		}
+		state = newState(state, this.repository.Update(&pb.Delivery{Id: delivery.Id}, delivery), true)
 	}
 
 	return state
@@ -50,15 +41,25 @@ func (this *service) Remove(state *pb.Deliveries, delivery *pb.Delivery) *pb.Del
 	if delivery.Id == 0 {
 		panic("This delivery not exists in the repository!")
 	}
-	this.events.RemovingDelivery(delivery)
-	where := func(a *pb.Delivery) { a.Id = delivery.Id }
-	this.repository.Delete(where)
-	newState := make([]*pb.Delivery, 0)
-	for _, aState := range state.Deliveries {
-		if delivery.Id != aState.Id {
-			newState = append(newState, aState)
+
+	if cancel := this.events.RemovingDelivery(delivery); cancel {
+		panic("Deletion was canceled through an event!")
+	}
+
+	return newState(state, this.repository.Delete(&pb.Delivery{Id: delivery.Id}), false)
+}
+
+func (this *service) RemoveByGroup(state *pb.Deliveries, group *pb.Group) *pb.Deliveries {
+	if group.Id == 0 {
+		panic("This group not exists in the repository!")
+	}
+
+	filter := &pb.Delivery{Group: group.Id}
+	for _, delivery := range this.repository.Select(filter) {
+		if cancel := this.events.RemovingDelivery(delivery); cancel {
+			panic("Deletion was canceled through an event!")
 		}
 	}
-	state.Deliveries = newState
-	return state
+
+	return newState(state, this.repository.Delete(filter), false)
 }

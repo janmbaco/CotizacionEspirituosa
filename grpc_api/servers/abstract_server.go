@@ -6,11 +6,12 @@ import (
 	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/core/common"
 	pb "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models"
 	ps "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/services"
+	redux "github.com/janmbaco/go-redux/core"
 )
 
 type AbstractsServer struct {
 	*ps.UnimplementedAbstractServer
-	*BaseServer
+	store   redux.Store
 	actions *abstracts.Actions
 	entity  abstracts.Entity
 }
@@ -21,9 +22,9 @@ func (s *AbstractsServer) Get(_ *pb.NullRequest, stream ps.Abstract_GetServer) e
 }
 
 func (s *AbstractsServer) Set(_ context.Context, abstract *pb.Abstract) (*pb.ResultResponse, error) {
-	return s.tryStoreDispatch(s.actions.Set.With(abstract)), nil
+	return tryStoreDispatch(s.store, s.actions.Set.With(abstract)), nil
 }
 
 func (s *AbstractsServer) Remove(_ context.Context, abstract *pb.Abstract) (*pb.ResultResponse, error) {
-	return s.tryStoreDispatch(s.actions.Remove.With(abstract)), nil
+	return tryStoreDispatch(s.store, s.actions.Remove.With(abstract)), nil
 }

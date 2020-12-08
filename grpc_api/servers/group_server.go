@@ -6,11 +6,12 @@ import (
 	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/core/groups"
 	pb "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models"
 	ps "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/services"
+	redux "github.com/janmbaco/go-redux/core"
 )
 
 type GroupServer struct {
 	*ps.UnimplementedGroupServer
-	*BaseServer
+	store   redux.Store
 	actions *groups.Actions
 	entity  groups.Entity
 }
@@ -21,9 +22,9 @@ func (s *GroupServer) Get(_ *pb.NullRequest, stream ps.Delivery_GetServer) error
 }
 
 func (s *GroupServer) Set(_ context.Context, group *pb.Group) (*pb.ResultResponse, error) {
-	return s.tryStoreDispatch(s.actions.Set.With(group)), nil
+	return tryStoreDispatch(s.store, s.actions.Set.With(group)), nil
 }
 
 func (s *GroupServer) Remove(_ context.Context, group *pb.Group) (*pb.ResultResponse, error) {
-	return s.tryStoreDispatch(s.actions.Remove.With(group)), nil
+	return tryStoreDispatch(s.store, s.actions.Remove.With(group)), nil
 }

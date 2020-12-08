@@ -8,11 +8,12 @@ type Service interface {
 	Get() *pb.Items
 	Set(state *pb.Items, item *pb.Item) *pb.Item
 	Remove(state *pb.Items, item *pb.Item) *pb.Items
+	RemoveByProduct(state *pb.Items, product *pb.Product) *pb.Items
+	RemoveByDelivery(state *pb.Items, delivery *pb.Delivery) *pb.Items
 }
 
 type service struct {
 	repository Repository
-	events     Events
 }
 
 func NewService(repository Repository) *service {
@@ -20,9 +21,8 @@ func NewService(repository Repository) *service {
 }
 
 func (this *service) Get() *pb.Items {
-	all := func(a *pb.Item) {}
 	return &pb.Items{
-		Items: this.repository.Select(all),
+		Items: this.repository.Select(&pb.Item{}),
 	}
 }
 
@@ -31,18 +31,8 @@ func (this *service) Set(state *pb.Items, item *pb.Item) *pb.Items {
 		item = this.repository.Insert(item)
 		state.Items = append(state.Items, item)
 	} else {
-		where := func(a *pb.Item) { a.Id = item.Id }
-		update := func(a *pb.Item) { a = item }
-		itemsModifieds := this.repository.Update(update, where)
-		for _, a := range itemsModifieds {
-			for _, aState := range state.Items {
-				if a.Id == aState.Id {
-					aState = a
-				}
-			}
-		}
+		state = newState(state, this.repository.Update(&pb.Item{Id: item.Id}, item), true)
 	}
-
 	return state
 }
 
@@ -50,15 +40,22 @@ func (this *service) Remove(state *pb.Items, item *pb.Item) *pb.Items {
 	if item.Id == 0 {
 		panic("This item not exists in the repository!")
 	}
-	this.events.RemovingItem(item)
-	where := func(a *pb.Item) { a.Id = item.Id }
-	this.repository.Delete(where)
-	newState := make([]*pb.Item, 0)
-	for _, aState := range state.Items {
-		if item.Id != aState.Id {
-			newState = append(newState, aState)
-		}
+
+	return newState(state, this.repository.Delete(&pb.Item{Id: item.Id}), false)
+}
+
+func (this *service) RemoveByProduct(state *pb.Items, product *pb.Product) *pb.Items {
+	if product.Id == 0 {
+		panic("This product not exists in the repository!")
 	}
-	state.Items = newState
-	return state
+
+	return newState(state, this.repository.Delete(&pb.Item{Product: product.Id}), false)
+}
+
+func (this *service) RemoveByDelivery(state *pb.Items, delivery *pb.Delivery) *pb.Items {
+	if delivery.Id == 0 {
+		panic("This product not exists in the repository!")
+	}
+
+	return newState(state, this.repository.Delete(&pb.Item{Delivery: delivery.Id}), false)
 }

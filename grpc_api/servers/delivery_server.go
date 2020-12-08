@@ -6,11 +6,12 @@ import (
 	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/core/deliveries"
 	pb "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models"
 	ps "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/services"
+	redux "github.com/janmbaco/go-redux/core"
 )
 
 type DeliveryServer struct {
 	*ps.UnimplementedDeliveryServer
-	*BaseServer
+	store   redux.Store
 	actions *deliveries.Actions
 	entity  deliveries.Entity
 }
@@ -21,9 +22,9 @@ func (s *DeliveryServer) Get(_ *pb.NullRequest, stream ps.Delivery_GetServer) er
 }
 
 func (s *DeliveryServer) Set(_ context.Context, delivery *pb.Delivery) (*pb.ResultResponse, error) {
-	return s.tryStoreDispatch(s.actions.Set.With(delivery)), nil
+	return tryStoreDispatch(s.store, s.actions.Set.With(delivery)), nil
 }
 
 func (s *DeliveryServer) Remove(_ context.Context, delivery *pb.Delivery) (*pb.ResultResponse, error) {
-	return s.tryStoreDispatch(s.actions.Remove.With(delivery)), nil
+	return tryStoreDispatch(s.store, s.actions.Remove.With(delivery)), nil
 }

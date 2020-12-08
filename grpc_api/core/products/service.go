@@ -8,6 +8,7 @@ type Service interface {
 	Get() *pb.Products
 	Set(state *pb.Products, product *pb.Product) *pb.Product
 	Remove(state *pb.Products, product *pb.Product) *pb.Products
+	RemoveByFamily(state *pb.Products, family *pb.Family) *pb.Products
 }
 
 type service struct {
@@ -20,9 +21,8 @@ func NewService(repository Repository) *service {
 }
 
 func (this *service) Get() *pb.Products {
-	all := func(a *pb.Product) {}
 	return &pb.Products{
-		Products: this.repository.Select(all),
+		Products: this.repository.Select(&pb.Product{}),
 	}
 }
 
@@ -31,16 +31,7 @@ func (this *service) Set(state *pb.Products, product *pb.Product) *pb.Products {
 		product = this.repository.Insert(product)
 		state.Products = append(state.Products, product)
 	} else {
-		where := func(a *pb.Product) { a.Id = product.Id }
-		update := func(a *pb.Product) { a = product }
-		productsModifieds := this.repository.Update(update, where)
-		for _, a := range productsModifieds {
-			for _, aState := range state.Products {
-				if a.Id == aState.Id {
-					aState = a
-				}
-			}
-		}
+		state = newState(state, this.repository.Update(&pb.Product{Id: product.Id}, product), true)
 	}
 
 	return state
@@ -50,15 +41,25 @@ func (this *service) Remove(state *pb.Products, product *pb.Product) *pb.Product
 	if product.Id == 0 {
 		panic("This product not exists in the repository!")
 	}
-	this.events.RemovingProduct(product)
-	where := func(a *pb.Product) { a.Id = product.Id }
-	this.repository.Delete(where)
-	newState := make([]*pb.Product, 0)
-	for _, aState := range state.Products {
-		if product.Id != aState.Id {
-			newState = append(newState, aState)
+
+	if cancel := this.events.RemovingProduct(product); cancel {
+		panic("Deletion was canceled through an event!")
+	}
+
+	return newState(state, this.repository.Delete(&pb.Product{Id: product.Id}), false)
+}
+
+func (this *service) RemoveByFamily(state *pb.Products, family *pb.Family) *pb.Products {
+	if family.Id == 0 {
+		panic("This family not exists in the repository!")
+	}
+
+	filter := &pb.Product{Family: family.Id}
+	for _, product := range this.repository.Select(filter) {
+		if cancel := this.events.RemovingProduct(product); cancel {
+			panic("Deletion was canceled through an event!")
 		}
 	}
-	state.Products = newState
-	return state
+
+	return newState(state, this.repository.Delete(filter), false)
 }

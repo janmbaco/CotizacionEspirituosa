@@ -1,38 +1,81 @@
 package common
 
 import (
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/core/deliveries"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/core/groups"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/core/items"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/core/products"
 	pb "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models"
+	"github.com/janmbaco/go-infrastructure/errorhandler"
 	redux "github.com/janmbaco/go-redux/core"
 )
 
 type EventsManager interface {
-	OnRemovingAbstract(abstract *pb.Abstract)
-	OnRemovingGroup(group *pb.Group)
-	OnRemovingDelivery(delivery *pb.Delivery)
-	OnRemovingFamily(family *pb.Family)
-	OnRemovingProduct(product *pb.Product)
+	OnRemovingAbstract(abstract *pb.Abstract) bool
+	OnRemovingGroup(group *pb.Group) bool
+	OnRemovingDelivery(delivery *pb.Delivery) bool
+	OnRemovingFamily(family *pb.Family) bool
+	OnRemovingProduct(product *pb.Product) bool
 }
 
 type eventsManager struct {
-	store redux.Store
+	store             redux.Store
+	groupsActions     *groups.Actions
+	deliveriesActions *deliveries.Actions
+	itemsActions      *items.Actions
+	productsActions   *products.Actions
 }
 
-func (e eventsManager) OnRemovingAbstract(abstract *pb.Abstract) {
-	panic("implement me")
+func NewEventsManager(store redux.Store, groupsActions *groups.Actions, deliveriesActions *deliveries.Actions, itemsActions *items.Actions, productsActions *products.Actions) *eventsManager {
+	return &eventsManager{store: store, groupsActions: groupsActions, deliveriesActions: deliveriesActions, itemsActions: itemsActions, productsActions: productsActions}
 }
 
-func (e eventsManager) OnRemovingGroup(group *pb.Group) {
-	panic("implement me")
+func (e eventsManager) OnRemovingAbstract(abstract *pb.Abstract) bool {
+	var cancel bool
+	errorhandler.TryCatchError(func() {
+		e.store.Dispatch(e.groupsActions.RemoveByAbstract.With(abstract))
+	}, func(err error) {
+		cancel = true
+	})
+	return cancel
 }
 
-func (e eventsManager) OnRemovingDelivery(delivery *pb.Delivery) {
-	panic("implement me")
+func (e eventsManager) OnRemovingGroup(group *pb.Group) bool {
+	var cancel bool
+	errorhandler.TryCatchError(func() {
+		e.store.Dispatch(e.deliveriesActions.RemoveByGroup.With(group))
+	}, func(err error) {
+		cancel = true
+	})
+	return cancel
 }
 
-func (e eventsManager) OnRemovingFamily(family *pb.Family) {
-	panic("implement me")
+func (e eventsManager) OnRemovingDelivery(delivery *pb.Delivery) bool {
+	var cancel bool
+	errorhandler.TryCatchError(func() {
+		e.store.Dispatch(e.itemsActions.RemoveByDelivery.With(delivery))
+	}, func(err error) {
+		cancel = true
+	})
+	return cancel
 }
 
-func (e eventsManager) OnRemovingProduct(product *pb.Product) {
-	panic("implement me")
+func (e eventsManager) OnRemovingFamily(family *pb.Family) bool {
+	var cancel bool
+	errorhandler.TryCatchError(func() {
+		e.store.Dispatch(e.productsActions.RemoveByFamily.With(family))
+	}, func(err error) {
+		cancel = true
+	})
+	return cancel
+}
+
+func (e eventsManager) OnRemovingProduct(product *pb.Product) bool {
+	var cancel bool
+	errorhandler.TryCatchError(func() {
+		e.store.Dispatch(e.itemsActions.RemoveByProduct.With(product))
+	}, func(err error) {
+		cancel = true
+	})
+	return cancel
 }

@@ -6,11 +6,12 @@ import (
 	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/core/products"
 	pb "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models"
 	ps "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/services"
+	redux "github.com/janmbaco/go-redux/core"
 )
 
 type ProductServer struct {
 	*ps.UnimplementedProductServer
-	*BaseServer
+	store   redux.Store
 	actions *products.Actions
 	entity  products.Entity
 }
@@ -21,9 +22,9 @@ func (s *ProductServer) Get(_ *pb.NullRequest, stream ps.Product_GetServer) erro
 }
 
 func (s *ProductServer) Set(_ context.Context, product *pb.Product) (*pb.ResultResponse, error) {
-	return s.tryStoreDispatch(s.actions.Set.With(product)), nil
+	return tryStoreDispatch(s.store, s.actions.Set.With(product)), nil
 }
 
 func (s *ProductServer) Remove(_ context.Context, product *pb.Product) (*pb.ResultResponse, error) {
-	return s.tryStoreDispatch(s.actions.Remove.With(product)), nil
+	return tryStoreDispatch(s.store, s.actions.Remove.With(product)), nil
 }

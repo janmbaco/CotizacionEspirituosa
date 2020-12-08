@@ -6,11 +6,12 @@ import (
 	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/core/families"
 	pb "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models"
 	ps "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/services"
+	redux "github.com/janmbaco/go-redux/core"
 )
 
 type FamilyServer struct {
 	*ps.UnimplementedFamilyServer
-	*BaseServer
+	store   redux.Store
 	actions *families.Actions
 	entity  families.Entity
 }
@@ -21,9 +22,9 @@ func (s *FamilyServer) Get(_ *pb.NullRequest, stream ps.Family_GetServer) error 
 }
 
 func (s *FamilyServer) Set(_ context.Context, family *pb.Family) (*pb.ResultResponse, error) {
-	return s.tryStoreDispatch(s.actions.Set.With(family)), nil
+	return tryStoreDispatch(s.store, s.actions.Set.With(family)), nil
 }
 
 func (s *FamilyServer) Remove(_ context.Context, family *pb.Family) (*pb.ResultResponse, error) {
-	return s.tryStoreDispatch(s.actions.Remove.With(family)), nil
+	return tryStoreDispatch(s.store, s.actions.Remove.With(family)), nil
 }

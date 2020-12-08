@@ -7,8 +7,7 @@ package domain.models;
 message Delivery {
     uint32 id = 1;
     uint32 group = 2;
-    repeated uint32 items = 3;
-    string name = 4;
+    string name = 3;
 }
 
 message Deliveries {

@@ -20,9 +20,8 @@ func NewService(repository Repository) *service {
 }
 
 func (this *service) Get() *pb.Abstracts {
-	all := func(a *pb.Abstract) {}
 	return &pb.Abstracts{
-		Abstracts: this.repository.Select(all),
+		Abstracts: this.repository.Select(&pb.Abstract{}),
 	}
 }
 
@@ -31,16 +30,7 @@ func (this *service) Set(state *pb.Abstracts, abstract *pb.Abstract) *pb.Abstrac
 		abstract = this.repository.Insert(abstract)
 		state.Abstracts = append(state.Abstracts, abstract)
 	} else {
-		where := func(a *pb.Abstract) { a.Id = abstract.Id }
-		update := func(a *pb.Abstract) { a = abstract }
-		abstractsModifieds := this.repository.Update(update, where)
-		for _, a := range abstractsModifieds {
-			for _, aState := range state.Abstracts {
-				if a.Id == aState.Id {
-					aState = a
-				}
-			}
-		}
+		state = newState(state, this.repository.Update(&pb.Abstract{Id: abstract.Id}, abstract), true)
 	}
 
 	return state
@@ -50,15 +40,11 @@ func (this *service) Remove(state *pb.Abstracts, abstract *pb.Abstract) *pb.Abst
 	if abstract.Id == 0 {
 		panic("This abstract not exists in the repository!")
 	}
-	this.events.RemovingAbstract(abstract)
-	where := func(a *pb.Abstract) { a.Id = abstract.Id }
-	this.repository.Delete(where)
-	newState := make([]*pb.Abstract, 0)
-	for _, aState := range state.Abstracts {
-		if abstract.Id != aState.Id {
-			newState = append(newState, aState)
-		}
+
+	if cancel := this.events.RemovingAbstract(abstract); cancel {
+		panic("Deletion was canceled through an event!")
 	}
-	state.Abstracts = newState
-	return state
+
+	return newState(state, this.repository.Delete(&pb.Abstract{Id: abstract.Id}), false)
+
 }

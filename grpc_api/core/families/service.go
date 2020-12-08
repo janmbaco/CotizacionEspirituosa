@@ -20,9 +20,8 @@ func NewService(repository Repository) *service {
 }
 
 func (this *service) Get() *pb.Families {
-	all := func(a *pb.Family) {}
 	return &pb.Families{
-		Families: this.repository.Select(all),
+		Families: this.repository.Select(&pb.Family{}),
 	}
 }
 
@@ -31,16 +30,7 @@ func (this *service) Set(state *pb.Families, family *pb.Family) *pb.Families {
 		family = this.repository.Insert(family)
 		state.Families = append(state.Families, family)
 	} else {
-		where := func(a *pb.Family) { a.Id = family.Id }
-		update := func(a *pb.Family) { a = family }
-		familysModifieds := this.repository.Update(update, where)
-		for _, a := range familysModifieds {
-			for _, aState := range state.Families {
-				if a.Id == aState.Id {
-					aState = a
-				}
-			}
-		}
+		state = newState(state, this.repository.Update(&pb.Family{Id: family.Id}, family), true)
 	}
 
 	return state
@@ -50,15 +40,12 @@ func (this *service) Remove(state *pb.Families, family *pb.Family) *pb.Families 
 	if family.Id == 0 {
 		panic("This family not exists in the repository!")
 	}
-	this.events.RemovingFamily(family)
-	where := func(a *pb.Family) { a.Id = family.Id }
-	this.repository.Delete(where)
-	newState := make([]*pb.Family, 0)
-	for _, aState := range state.Families {
-		if family.Id != aState.Id {
-			newState = append(newState, aState)
-		}
+
+	if cancel := this.events.RemovingFamily(family); cancel {
+		panic("Deletion was canceled through an event!")
 	}
-	state.Families = newState
+
+	state = newState(state, this.repository.Delete(&pb.Family{Id: family.Id}), false)
+
 	return state
 }

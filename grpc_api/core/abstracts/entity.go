@@ -3,7 +3,6 @@ package abstracts
 import (
 	pb "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models"
 	"github.com/janmbaco/copier"
-	events2 "github.com/janmbaco/go-infrastructure/events"
 )
 
 type Entity interface {
@@ -13,14 +12,13 @@ type Entity interface {
 }
 
 type entity struct {
-	service   Service
-	publisher events2.Publisher
-	current   *pb.Abstracts
-	isBusy    chan bool
+	service Service
+	current *pb.Abstracts
+	isBusy  chan bool
 }
 
-func NewEntity(service Service, publisher events2.Publisher) *entity {
-	return &entity{service: service, publisher: publisher, isBusy: make(chan bool, 1)}
+func NewEntity(service Service) *entity {
+	return &entity{service: service, isBusy: make(chan bool, 1)}
 }
 
 func (e *entity) GetInitialState() interface{} {

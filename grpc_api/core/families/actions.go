@@ -7,3 +7,9 @@ type Actions struct {
 	Set           redux.Action
 	Remove        redux.Action
 }
+
+func NewActions() *Actions {
+	result := &Actions{}
+	result.ActionsObject = redux.NewActionsObject(result)
+	return result
+}

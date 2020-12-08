@@ -6,14 +6,10 @@ import (
 	redux "github.com/janmbaco/go-redux/core"
 )
 
-type BaseServer struct {
-	store redux.Store
-}
-
-func (this *BaseServer) tryStoreDispatch(action redux.Action) *models.ResultResponse {
+func tryStoreDispatch(store redux.Store, action redux.Action) *models.ResultResponse {
 	result := &models.ResultResponse{}
 	errorhandler.TryCatchError(func() {
-		this.store.Dispatch(action)
+		store.Dispatch(action)
 	}, func(err error) {
 		result.Result = models.Result_KO
 		result.ErrorMessage = err.Error()
