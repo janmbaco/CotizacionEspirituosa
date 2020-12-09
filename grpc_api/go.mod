@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/golang/protobuf v1.4.3
+	github.com/google/wire v0.4.0
 	github.com/janmbaco/copier v0.0.0
 	github.com/janmbaco/go-infrastructure v0.0.8
 	github.com/janmbaco/go-redux v0.0.15

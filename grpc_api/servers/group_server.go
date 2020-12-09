@@ -2,10 +2,9 @@ package servers
 
 import (
 	"context"
-	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/core/common"
-	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/core/groups"
 	pb "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models"
 	ps "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/services"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/state/groups"
 	redux "github.com/janmbaco/go-redux/core"
 )
 
@@ -16,8 +15,12 @@ type GroupServer struct {
 	entity  groups.Entity
 }
 
+func NewGroupServer(store redux.Store, actions *groups.Actions, entity groups.Entity) *GroupServer {
+	return &GroupServer{store: store, actions: actions, entity: entity}
+}
+
 func (s *GroupServer) Get(_ *pb.NullRequest, stream ps.Delivery_GetServer) error {
-	common.NewStateSender(s.store, s.entity, stream).Initialize()
+	NewStateSender(s.store, s.entity, stream).Initialize()
 	return nil
 }
 

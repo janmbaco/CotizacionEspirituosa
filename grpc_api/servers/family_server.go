@@ -2,10 +2,9 @@ package servers
 
 import (
 	"context"
-	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/core/common"
-	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/core/families"
 	pb "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models"
 	ps "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/services"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/state/families"
 	redux "github.com/janmbaco/go-redux/core"
 )
 
@@ -16,8 +15,12 @@ type FamilyServer struct {
 	entity  families.Entity
 }
 
+func NewFamilyServer(store redux.Store, actions *families.Actions, entity families.Entity) *FamilyServer {
+	return &FamilyServer{store: store, actions: actions, entity: entity}
+}
+
 func (s *FamilyServer) Get(_ *pb.NullRequest, stream ps.Family_GetServer) error {
-	common.NewStateSender(s.store, s.entity, stream).Initialize()
+	NewStateSender(s.store, s.entity, stream).Initialize()
 	return nil
 }
 

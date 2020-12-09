@@ -2,10 +2,9 @@ package servers
 
 import (
 	"context"
-	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/core/common"
-	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/core/items"
 	pb "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models"
 	ps "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/services"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/state/items"
 	redux "github.com/janmbaco/go-redux/core"
 )
 
@@ -16,8 +15,12 @@ type ItemServer struct {
 	entity  items.Entity
 }
 
+func NewItemServer(store redux.Store, actions *items.Actions, entity items.Entity) *ItemServer {
+	return &ItemServer{store: store, actions: actions, entity: entity}
+}
+
 func (s *ItemServer) Get(_ *pb.NullRequest, stream ps.Item_GetServer) error {
-	common.NewStateSender(s.store, s.entity, stream).Initialize()
+	NewStateSender(s.store, s.entity, stream).Initialize()
 	return nil
 }
 
