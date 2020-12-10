@@ -4,12 +4,12 @@ package container
 
 import (
 	"github.com/google/wire"
-	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/container/abstracts"
-	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/container/deliveries"
-	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/container/families"
-	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/container/groups"
-	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/container/items"
-	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/container/products"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/abstracts"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/deliveries"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/families"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/groups"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/items"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/products"
 	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/context"
 	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/events"
 	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/servers"
@@ -17,12 +17,12 @@ import (
 )
 
 func NewContainer(ctx *context.Context) *Container {
-	wire.Build(newContainer, newProductServer, newItemServer, newGroupServer, newFamilyServer, newDeliveryServer, newAbstractsSever, newEventsManager, newStore, newEventsActions, products.NewProductsContainer, items.NewItemsContainer, groups.NewGroupsContainer, families.NewFamiliesContainer, deliveries.NewDeliveriesContainer, abstracts.NewAbstractsContainer)
+	wire.Build(newContainer, newProductServer, newItemServer, newGroupServer, newFamilyServer, newDeliveryServer, newAbstractsSever, newEventsManager, newStore, newEventsSubscriber, products.NewProductsContainer, items.NewItemsContainer, groups.NewGroupsContainer, families.NewFamiliesContainer, deliveries.NewDeliveriesContainer, abstracts.NewAbstractsContainer)
 	return &Container{}
 }
 
-func newEventsActions(abstractsContainer *abstracts.Container, deliveriesContainer *deliveries.Container, familiesContainer *families.Container, groupsContainer *groups.Container, itemsContainer *items.Container, productsContainer *products.Container) *events.EventsActions {
-	return events.NewEventActions(abstractsContainer.Events.Subscribe, deliveriesContainer.Events.Subscribe, familiesContainer.Events.Subscribe, groupsContainer.Events.Subscribe, productsContainer.Events.Subscribe)
+func newEventsSubscriber(abstractsContainer *abstracts.Container, deliveriesContainer *deliveries.Container, familiesContainer *families.Container, groupsContainer *groups.Container, itemsContainer *items.Container, productsContainer *products.Container) *events.Subscriber {
+	return events.NewSubscriber(abstractsContainer.Events.Subscribe, deliveriesContainer.Events.Subscribe, familiesContainer.Events.Subscribe, groupsContainer.Events.Subscribe, productsContainer.Events.Subscribe)
 }
 
 func newStore(abstractsContainer *abstracts.Container, deliveriesContainer *deliveries.Container, familiesContainer *families.Container, groupsContainer *groups.Container, itemsContainer *items.Container, productsContainer *products.Container) redux.Store {
@@ -35,8 +35,8 @@ func newStore(abstractsContainer *abstracts.Container, deliveriesContainer *deli
 	return redux.NewStore(abstractsBo, deliveriesBo, familiesBo, groupsBo, itemsBo, productsBo)
 }
 
-func newEventsManager(store redux.Store, deliveriesContainer *deliveries.Container, groupsContainer *groups.Container, itemsContainer *items.Container, productsContainer *products.Container) events.EventsManager {
-	return events.NewEventsManager(store, groupsContainer.Actions, deliveriesContainer.Actions, itemsContainer.Actions, productsContainer.Actions)
+func newEventsManager(store redux.Store, deliveriesContainer *deliveries.Container, groupsContainer *groups.Container, itemsContainer *items.Container, productsContainer *products.Container) events.Manager {
+	return events.NewManager(store, groupsContainer.Actions, deliveriesContainer.Actions, itemsContainer.Actions, productsContainer.Actions)
 }
 
 func newAbstractsSever(store redux.Store, abstractsContainer *abstracts.Container) *servers.AbstractServer {

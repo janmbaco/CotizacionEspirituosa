@@ -37,6 +37,7 @@ github.com/google/subcommands v1.0.1/go.mod h1:ZjhPrFU+Olkh9WazFPsl27BQ4UPiG37m3
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/wire v0.4.0 h1:kXcsA/rIGzJImVqPdhfnr6q0xsS9gU0515q1EPpJ9fE=
 github.com/google/wire v0.4.0/go.mod h1:ngWDr9Qvq3yZA10YrxfyGELY/AFWGVpy9c1LTRi1EoU=
+github.com/janmbaco/CotizacionEspirituosa v0.0.0-20200923113954-9303fa5cb743 h1:/QJYfBATN7qoBO6eXmPdbfnqhUX1WZBy4BAt90q+Xz0=
 github.com/janmbaco/copier v0.0.0 h1:F+DgOnHVGagminH9nyXmNN7qY/BfCwHY77eJUauz3Dw=
 github.com/janmbaco/copier v0.0.0/go.mod h1:PmbuQgYf3AI6UDwdSPMV4yMLkWvLbs0MG+CBSvlFw0s=
 github.com/janmbaco/go-infrastructure v0.0.8 h1:GcRePP4yjVjOu0jS+8MUw0HgsPfVdvj3Ugp/1EsDSm0=

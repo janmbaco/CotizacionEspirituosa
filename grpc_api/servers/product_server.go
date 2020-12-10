@@ -2,9 +2,9 @@ package servers
 
 import (
 	"context"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/products"
 	pb "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models"
 	ps "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/services"
-	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/state/products"
 	redux "github.com/janmbaco/go-redux/core"
 )
 
