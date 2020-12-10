@@ -2,34 +2,44 @@ package main
 
 import (
 	"flag"
+	app2 "github.com/janmbaco/CotizacionEspirituosa/grpc_api/app"
 	"os"
 
-	"google.golang.org/grpc"
-
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/configs"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/container"
 	ps "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/services"
-	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/servers"
-	"github.com/janmbaco/go-infrastructure/config"
+	"github.com/janmbaco/go-infrastructure/logs"
 	"github.com/janmbaco/go-infrastructure/server"
 	_ "github.com/jnewmano/grpc-json-proxy/codec"
+	"google.golang.org/grpc"
 )
 
-type Config struct {
-	Version string `json:"version"`
-	Port    string `json:"port"`
-}
-
 func main() {
-	var configfile = flag.String("config", os.Args[0]+".config", "Config File")
+	var file = flag.String("configs", os.Args[0]+".configs", "Config File")
 	flag.Parse()
-	configHandler := config.NewFileConfigHandler(*configfile)
-	conf := &Config{Version: "0.0.0", Port: ":8080"}
-	configHandler.Load(conf)
 
-	server.NewListener(configHandler, func(serverSetter *server.ServerSetter) {
+	config := configs.NewConfig(
+		container.NewConfigHandler(*file),
+		"8080",
+		configs.NewDataBaseInfo(configs.Sqlite, "./new.db", "", "", "", ""),
+		configs.NewLogInfo(logs.Info, logs.Error, "./logs"))
+
+	ctx := app2.NewContext(config)
+
+	app := container.NewInfrastructure(ctx)
+
+	app.EventsSubscriber.Initialize(app.EventManager)
+
+	server.NewListener(config, func(serverSetter *server.ServerSetter) {
 		serverSetter.ServerType = server.GRpcSever
-		serverSetter.Addr = conf.Port
+		serverSetter.Addr = config.Port
 	}).SetProtobuf(func(grpcServer *grpc.Server) {
-		ps.RegisterStatusServer(grpcServer, &servers.StatusService{})
+		ps.RegisterAbstractServer(grpcServer, app.AbstractServer)
+		ps.RegisterDeliveryServer(grpcServer, app.DeliveryServer)
+		ps.RegisterFamilyServer(grpcServer, app.FamiliesServer)
+		ps.RegisterGroupServer(grpcServer, app.GroupServer)
+		ps.RegisterItemServer(grpcServer, app.ItemServer)
+		ps.RegisterProductServer(grpcServer, app.ProductServer)
 
 	}).Start()
 }

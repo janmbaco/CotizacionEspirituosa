@@ -1,4 +1,4 @@
-package config
+package configs
 
 import "github.com/janmbaco/go-infrastructure/logs"
 

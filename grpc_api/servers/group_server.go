@@ -19,7 +19,7 @@ func NewGroupServer(store redux.Store, actions *groups.Actions, entity groups.En
 	return &GroupServer{store: store, actions: actions, entity: entity}
 }
 
-func (s *GroupServer) Get(_ *pb.NullRequest, stream ps.Delivery_GetServer) error {
+func (s *GroupServer) Get(_ *pb.NullRequest, stream ps.Group_GetServer) error {
 	NewStateSender(s.store, s.entity, stream).Initialize()
 	return nil
 }
