@@ -49,7 +49,7 @@ func (this *service) RemoveByProduct(state *pb.Items, product *pb.Product) *pb.I
 		panic("This product not exists in the repository!")
 	}
 
-	return newState(state, this.repository.Delete(&pb.Item{Product: product.Id}), false)
+	return newState(state, this.repository.Delete(&pb.Item{ProductId: product.Id}), false)
 }
 
 func (this *service) RemoveByDelivery(state *pb.Items, delivery *pb.Delivery) *pb.Items {
@@ -57,5 +57,5 @@ func (this *service) RemoveByDelivery(state *pb.Items, delivery *pb.Delivery) *p
 		panic("This product not exists in the repository!")
 	}
 
-	return newState(state, this.repository.Delete(&pb.Item{Delivery: delivery.Id}), false)
+	return newState(state, this.repository.Delete(&pb.Item{DeliveryId: delivery.Id}), false)
 }

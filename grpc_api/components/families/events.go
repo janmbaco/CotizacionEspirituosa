@@ -8,7 +8,7 @@ import (
 
 type Events interface {
 	RemovingFamily(family *pb.Family) bool
-	Subscribe(fn func(family *pb.Family) bool)
+	OnRemovingSubscribe(fn func(family *pb.Family) bool)
 }
 
 const familyEvents = "familyEvents"
@@ -23,7 +23,7 @@ func NewEvents(publisher events2.Publisher) Events {
 	return &events{publisher: publisher}
 }
 
-func (e *events) Subscribe(fn func(family *pb.Family) bool) {
+func (e *events) OnRemovingSubscribe(fn func(family *pb.Family) bool) {
 	e.publisher.Subscribe(familyEvents, func() {
 		if !e.cancel {
 			errorhandler.TryCatchError(func() {

@@ -8,7 +8,7 @@ import (
 
 type Events interface {
 	RemovingAbstract(abstract *pb.Abstract) bool
-	Subscribe(fn func(abstract *pb.Abstract) bool)
+	OnRemovingSubscribe(fn func(abstract *pb.Abstract) bool)
 }
 
 const abstractEvents = "abstractEvents"
@@ -23,7 +23,7 @@ func NewEvents(publisher events2.Publisher) Events {
 	return &events{publisher: publisher}
 }
 
-func (e *events) Subscribe(fn func(abstract *pb.Abstract) bool) {
+func (e *events) OnRemovingSubscribe(fn func(abstract *pb.Abstract) bool) {
 	e.publisher.Subscribe(abstractEvents, func() {
 		if !e.cancel {
 			errorhandler.TryCatchError(func() {

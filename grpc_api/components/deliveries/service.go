@@ -54,7 +54,7 @@ func (this *service) RemoveByGroup(state *pb.Deliveries, group *pb.Group) *pb.De
 		panic("This group not exists in the repository!")
 	}
 
-	filter := &pb.Delivery{Group: group.Id}
+	filter := &pb.Delivery{GroupId: group.Id}
 	for _, delivery := range this.repository.Select(filter) {
 		if cancel := this.events.RemovingDelivery(delivery); cancel {
 			panic("Deletion was canceled through an event!")

@@ -54,7 +54,7 @@ func (this *service) RemoveByFamily(state *pb.Products, family *pb.Family) *pb.P
 		panic("This family not exists in the repository!")
 	}
 
-	filter := &pb.Product{Family: family.Id}
+	filter := &pb.Product{FamilyId: family.Id}
 	for _, product := range this.repository.Select(filter) {
 		if cancel := this.events.RemovingProduct(product); cancel {
 			panic("Deletion was canceled through an event!")

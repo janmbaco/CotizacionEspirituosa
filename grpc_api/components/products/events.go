@@ -8,7 +8,7 @@ import (
 
 type Events interface {
 	RemovingProduct(product *pb.Product) bool
-	Subscribe(fn func(product *pb.Product) bool)
+	OnRemovingSubscribe(fn func(product *pb.Product) bool)
 }
 
 const productEvents = "productEvents"
@@ -23,7 +23,7 @@ func NewEvents(publisher events2.Publisher) Events {
 	return &events{publisher: publisher}
 }
 
-func (e *events) Subscribe(fn func(product *pb.Product) bool) {
+func (e *events) OnRemovingSubscribe(fn func(product *pb.Product) bool) {
 	e.publisher.Subscribe(productEvents, func() {
 		if !e.cancel {
 			errorhandler.TryCatchError(func() {

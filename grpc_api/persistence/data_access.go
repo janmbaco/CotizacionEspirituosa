@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"github.com/janmbaco/go-infrastructure/errorhandler"
+	"github.com/janmbaco/go-infrastructure/logs"
 	"gorm.io/gorm"
 	"reflect"
 )
@@ -24,7 +25,9 @@ type dataAccess struct {
 }
 
 func NewDataAccess(db *gorm.DB, modelType reflect.Type, filterType reflect.Type, getIds FnGetIds) DataAccess {
-	return &dataAccess{db: db, modelType: modelType, filterType: filterType, GetIds: getIds}
+	result := &dataAccess{db: db, datamodel: reflect.New(modelType.Elem()).Interface(), modelType: modelType, filterType: filterType, GetIds: getIds}
+	_ = result.db.AutoMigrate(result.datamodel)
+	return result
 }
 
 func (r *dataAccess) Insert(datarow interface{}) interface{} {
@@ -44,10 +47,15 @@ func (r *dataAccess) Select(datafilter interface{}) interface{} {
 	if reflect.TypeOf(datafilter) != r.filterType {
 		panic("The datafilter does not belong to this dataAccess!")
 	}
-
-	dataArray := reflect.MakeSlice(reflect.SliceOf(r.modelType), 0, 10)
-	r.db.Model(r.modelType).Where(datafilter).Find(dataArray)
-	return dataArray
+	slice := reflect.MakeSlice(reflect.SliceOf(r.modelType), 0, 0)
+	pointer := reflect.New(slice.Type())
+	pointer.Elem().Set(slice)
+	dataArray := pointer.Interface()
+	result := r.db.Model(r.datamodel).Where(datafilter).Find(dataArray)
+	if result.Error != nil {
+		logs.Log.Info(result.Error.Error())
+	}
+	return reflect.ValueOf(dataArray).Elem().Interface()
 }
 
 func (r *dataAccess) Update(datafilter interface{}, datarow interface{}) interface{} {
@@ -61,6 +69,6 @@ func (r *dataAccess) Delete(datafilter interface{}) interface{} {
 	errorhandler.CheckNilParameter(map[string]interface{}{"datafilter": datafilter})
 
 	dataArray := r.Select(datafilter)
-	r.db.Model(r.modelType).Delete(datafilter, r.GetIds(dataArray))
+	r.db.Model(r.datamodel).Delete(datafilter, r.GetIds(dataArray))
 	return dataArray
 }

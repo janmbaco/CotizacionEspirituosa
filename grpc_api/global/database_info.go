@@ -1,4 +1,4 @@
-package configs
+package global
 
 type DBEngine uint8
 

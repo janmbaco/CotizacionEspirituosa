@@ -1,21 +1,23 @@
 package app
 
 import (
-	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/events"
-	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/servers"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/abstracts"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/deliveries"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/families"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/groups"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/items"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/products"
 )
 
 type Infrastructure struct {
-	EventsSubscriber *events.Subscriber
-	EventManager     events.Manager
-	AbstractServer   *servers.AbstractServer
-	DeliveryServer   *servers.DeliveryServer
-	FamiliesServer   *servers.FamilyServer
-	GroupServer      *servers.GroupServer
-	ItemServer       *servers.ItemServer
-	ProductServer    *servers.ProductServer
+	AbstractsInfrastructure  *abstracts.Infrastructure
+	DeliveriesInfrastructure *deliveries.Infrastructure
+	FamiliesInfrastructure   *families.Infrastructure
+	GroupsInfrastructure     *groups.Infrastructure
+	ItemsInfrastructure      *items.Infrastructure
+	ProductsInfrastructure   *products.Infrastructure
 }
 
-func NewInfrastructure(eventsActions *events.Subscriber, eventManager events.Manager, abstractServer *servers.AbstractServer, deliveryServer *servers.DeliveryServer, familiesServer *servers.FamilyServer, groupServer *servers.GroupServer, itemServer *servers.ItemServer, productServer *servers.ProductServer) *Infrastructure {
-	return &Infrastructure{EventsSubscriber: eventsActions, EventManager: eventManager, AbstractServer: abstractServer, DeliveryServer: deliveryServer, FamiliesServer: familiesServer, GroupServer: groupServer, ItemServer: itemServer, ProductServer: productServer}
+func NewInfrastructure(abstractsInfrastructure *abstracts.Infrastructure, deliveriesInfrastructure *deliveries.Infrastructure, familiesInfrastructure *families.Infrastructure, groupsInfrastructure *groups.Infrastructure, itemsInfrastructure *items.Infrastructure, productsInfrastructure *products.Infrastructure) *Infrastructure {
+	return &Infrastructure{AbstractsInfrastructure: abstractsInfrastructure, DeliveriesInfrastructure: deliveriesInfrastructure, FamiliesInfrastructure: familiesInfrastructure, GroupsInfrastructure: groupsInfrastructure, ItemsInfrastructure: itemsInfrastructure, ProductsInfrastructure: productsInfrastructure}
 }

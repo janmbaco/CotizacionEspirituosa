@@ -8,7 +8,7 @@ import (
 
 type Events interface {
 	RemovingGroup(group *pb.Group) bool
-	Subscribe(fn func(group *pb.Group) bool)
+	OnRemovingSubscribe(fn func(group *pb.Group) bool)
 }
 
 const groupEvents = "groupEvents"
@@ -23,7 +23,7 @@ func NewEvents(publisher events2.Publisher) Events {
 	return &events{publisher: publisher}
 }
 
-func (e *events) Subscribe(fn func(group *pb.Group) bool) {
+func (e *events) OnRemovingSubscribe(fn func(group *pb.Group) bool) {
 	e.publisher.Subscribe(groupEvents, func() {
 		if !e.cancel {
 			errorhandler.TryCatchError(func() {

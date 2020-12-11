@@ -53,7 +53,7 @@ func (this *service) RemoveByAbstract(state *pb.Groups, abstract *pb.Abstract) *
 		panic("This abstract not exists in the repository!")
 	}
 
-	filter := &pb.Group{Abstract: abstract.Id}
+	filter := &pb.Group{AbstractId: abstract.Id}
 	for _, group := range this.repository.Select(filter) {
 		if cancel := this.events.RemovingGroup(group); cancel {
 			panic("Deletion was canceled through an event!")

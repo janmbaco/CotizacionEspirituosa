@@ -1,4 +1,4 @@
-package configs
+package global
 
 import (
 	"github.com/janmbaco/go-infrastructure/config"

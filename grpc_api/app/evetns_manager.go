@@ -1,4 +1,4 @@
-package events
+package app
 
 import (
 	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/deliveries"
@@ -10,7 +10,7 @@ import (
 	redux "github.com/janmbaco/go-redux/core"
 )
 
-type Manager interface {
+type EventsManager interface {
 	OnRemovingAbstract(abstract *pb.Abstract) bool
 	OnRemovingGroup(group *pb.Group) bool
 	OnRemovingDelivery(delivery *pb.Delivery) bool
@@ -18,7 +18,7 @@ type Manager interface {
 	OnRemovingProduct(product *pb.Product) bool
 }
 
-type manager struct {
+type eventsManager struct {
 	store             redux.Store
 	groupsActions     *groups.Actions
 	deliveriesActions *deliveries.Actions
@@ -26,11 +26,19 @@ type manager struct {
 	productsActions   *products.Actions
 }
 
-func NewManager(store redux.Store, groupsActions *groups.Actions, deliveriesActions *deliveries.Actions, itemsActions *items.Actions, productsActions *products.Actions) Manager {
-	return &manager{store: store, groupsActions: groupsActions, deliveriesActions: deliveriesActions, itemsActions: itemsActions, productsActions: productsActions}
+func NewEventManager(store redux.Store, groupsActions *groups.Actions, deliveriesActions *deliveries.Actions, itemsActions *items.Actions, productsActions *products.Actions) EventsManager {
+
+	return &eventsManager{
+		store:             store,
+		groupsActions:     groupsActions,
+		deliveriesActions: deliveriesActions,
+		itemsActions:      itemsActions,
+		productsActions:   productsActions,
+	}
+
 }
 
-func (e manager) OnRemovingAbstract(abstract *pb.Abstract) bool {
+func (e eventsManager) OnRemovingAbstract(abstract *pb.Abstract) bool {
 	var cancel bool
 	errorhandler.TryCatchError(func() {
 		e.store.Dispatch(e.groupsActions.RemoveByAbstract.With(abstract))
@@ -40,7 +48,7 @@ func (e manager) OnRemovingAbstract(abstract *pb.Abstract) bool {
 	return cancel
 }
 
-func (e manager) OnRemovingGroup(group *pb.Group) bool {
+func (e eventsManager) OnRemovingGroup(group *pb.Group) bool {
 	var cancel bool
 	errorhandler.TryCatchError(func() {
 		e.store.Dispatch(e.deliveriesActions.RemoveByGroup.With(group))
@@ -50,7 +58,7 @@ func (e manager) OnRemovingGroup(group *pb.Group) bool {
 	return cancel
 }
 
-func (e manager) OnRemovingDelivery(delivery *pb.Delivery) bool {
+func (e eventsManager) OnRemovingDelivery(delivery *pb.Delivery) bool {
 	var cancel bool
 	errorhandler.TryCatchError(func() {
 		e.store.Dispatch(e.itemsActions.RemoveByDelivery.With(delivery))
@@ -60,7 +68,7 @@ func (e manager) OnRemovingDelivery(delivery *pb.Delivery) bool {
 	return cancel
 }
 
-func (e manager) OnRemovingFamily(family *pb.Family) bool {
+func (e eventsManager) OnRemovingFamily(family *pb.Family) bool {
 	var cancel bool
 	errorhandler.TryCatchError(func() {
 		e.store.Dispatch(e.productsActions.RemoveByFamily.With(family))
@@ -70,7 +78,7 @@ func (e manager) OnRemovingFamily(family *pb.Family) bool {
 	return cancel
 }
 
-func (e manager) OnRemovingProduct(product *pb.Product) bool {
+func (e eventsManager) OnRemovingProduct(product *pb.Product) bool {
 	var cancel bool
 	errorhandler.TryCatchError(func() {
 		e.store.Dispatch(e.itemsActions.RemoveByProduct.With(product))
