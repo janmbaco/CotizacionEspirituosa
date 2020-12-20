@@ -6,8 +6,8 @@ package domain.models;
 
 message Item {
     uint32 id= 1;
-    uint32 delivery = 2;
-    uint32 product = 3;
+    uint32 delivery_id = 2;
+    uint32 product_id = 3;
     float incPrice = 4;
     int32 quantity = 5;
 }

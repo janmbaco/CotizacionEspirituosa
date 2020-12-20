@@ -6,7 +6,7 @@ package domain.models;
 
 message Delivery {
     uint32 id = 1;
-    uint32 group = 2;
+    uint32 group_id = 2;
     string name = 3;
 }
 

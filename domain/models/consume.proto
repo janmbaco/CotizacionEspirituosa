@@ -5,7 +5,7 @@ option go_package = "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/m
 package domain.models;
 
 message Consume {
-    uint32 delivery = 1;
+    uint32 delivery_id = 1;
     int64 date = 2;
     float price = 3;
 }

@@ -6,7 +6,7 @@ package domain.models;
 
 message Product {
     uint32 id = 1;
-    uint32 family = 2;
+    uint32 family_id = 2;
     string name = 3;
 }
 

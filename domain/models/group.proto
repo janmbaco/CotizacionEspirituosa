@@ -6,7 +6,7 @@ package domain.models;
 
 message Group {
     uint32 id = 1;
-    uint32 abstract = 2;
+    uint32 abstract_id = 2;
     string name = 3;
     float basePrice = 4;
     float priceStep = 5;

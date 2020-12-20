@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app/src/pages/home_page.dart';
+import 'package:mobile_app/src/common/widgets/home_widget.dart';
 import 'package:mobile_app/src/routes/routes.dart';
 
 void main() => runApp(CotizacionEspirituosaApp());
@@ -9,13 +9,12 @@ class CotizacionEspirituosaApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: "Cotización Espirituosa",
+        debugShowCheckedModeBanner: false,
+        title: "Cotización Espirituosa",
         initialRoute: '/',
         routes: getApplicationsRoutes(),
         onGenerateRoute: (settings) =>
-            MaterialPageRoute(builder: (context) => HomePage())
-    );
+            MaterialPageRoute(builder: (context) => HomeWidget()));
   }
 }
 
