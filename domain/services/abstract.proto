@@ -10,11 +10,13 @@ import "domain/models/response.proto";
 
 service Abstract {
 
-    rpc Set( domain.models.Abstract )  returns ( domain.models.ResultResponse  ) {}
+    rpc Set ( domain.models.Abstract )  returns ( domain.models.ResultResponse  ) {}
 
-    rpc Get( domain.models.NullRequest )  returns ( stream domain.models.Abstracts ) {}
+    rpc Get ( domain.models.NullRequest )  returns (  domain.models.Abstracts ) {}
 
-    rpc Remove( domain.models.Abstract )  returns ( domain.models.ResultResponse  ) {}
+    rpc Remove ( domain.models.Abstract )  returns ( domain.models.ResultResponse  ) {}
+
+    rpc Subscribe ( domain.models.NullRequest ) returns ( stream domain.models.Abstracts ) {}
 
 }
 

@@ -1,1 +1,1 @@
-class Connect<State> {}
+class Connect {}

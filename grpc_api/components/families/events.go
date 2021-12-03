@@ -24,7 +24,7 @@ func NewEvents(publisher events2.Publisher) Events {
 }
 
 func (e *events) OnRemovingSubscribe(fn func(family *pb.Family) bool) {
-	e.publisher.Subscribe(familyEvents, func() {
+	onRemoving := func() {
 		if !e.cancel {
 			errorhandler.TryCatchError(func() {
 				e.cancel = fn(e.family)
@@ -32,7 +32,8 @@ func (e *events) OnRemovingSubscribe(fn func(family *pb.Family) bool) {
 				e.cancel = true
 			})
 		}
-	})
+	}
+	e.publisher.Subscribe(familyEvents, &onRemoving)
 }
 
 func (e *events) RemovingFamily(family *pb.Family) bool {

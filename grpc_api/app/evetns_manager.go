@@ -7,7 +7,7 @@ import (
 	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/products"
 	pb "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models"
 	"github.com/janmbaco/go-infrastructure/errorhandler"
-	redux "github.com/janmbaco/go-redux/core"
+	redux "github.com/janmbaco/go-redux/src"
 )
 
 type EventsManager interface {

@@ -11,7 +11,7 @@ import (
 )
 
 func NewAbstractsInfrastructure(context *global.Context) *Infrastructure {
-	wire.Build(newInfrastructure, NewActions, NewEntity, NewService, NewRepository, newDataAccess, newEvents)
+	wire.Build(newInfrastructure, NewActions,  NewService, NewRepository, newDataAccess, newEvents)
 	return &Infrastructure{}
 }
 
@@ -20,5 +20,5 @@ func newEvents(context *global.Context) Events {
 }
 
 func newDataAccess(context *global.Context) persistence.DataAccess {
-	return persistence.NewDataAccess(context.DB, reflect.TypeOf(&pb.Abstract{}), reflect.TypeOf(&pb.Abstract{}), GetIds)
+	return persistence.NewDataAccess(context.DB, reflect.TypeOf(&pb.Abstract{}))
 }

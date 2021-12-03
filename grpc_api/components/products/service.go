@@ -28,13 +28,12 @@ func (this *service) Get() *pb.Products {
 
 func (this *service) Set(state *pb.Products, product *pb.Product) *pb.Products {
 	if product.Id == 0 {
-		product = this.repository.Insert(product)
-		state.Products = append(state.Products, product)
+		this.repository.Insert(product)
 	} else {
-		state = newState(state, this.repository.Update(&pb.Product{Id: product.Id}, product), true)
+		this.repository.Update(&pb.Product{Id: product.Id}, product)
 	}
 
-	return state
+	return this.Get()
 }
 
 func (this *service) Remove(state *pb.Products, product *pb.Product) *pb.Products {
@@ -46,7 +45,9 @@ func (this *service) Remove(state *pb.Products, product *pb.Product) *pb.Product
 		panic("Deletion was canceled through an event!")
 	}
 
-	return newState(state, this.repository.Delete(&pb.Product{Id: product.Id}), false)
+	this.repository.Delete(&pb.Product{Id: product.Id})
+
+	return this.Get()
 }
 
 func (this *service) RemoveByFamily(state *pb.Products, family *pb.Family) *pb.Products {
@@ -61,5 +62,6 @@ func (this *service) RemoveByFamily(state *pb.Products, family *pb.Family) *pb.P
 		}
 	}
 
-	return newState(state, this.repository.Delete(filter), false)
+	this.repository.Delete(filter)
+	return this.Get()
 }

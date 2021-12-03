@@ -12,5 +12,7 @@ service Consume {
 
     rpc Set ( stream domain.models.Consume )  returns ( domain.models.ResultResponse ) {}
 
-    rpc Get ( domain.models.NullRequest ) returns ( stream domain.models.Consumes ) {}
+    rpc Get ( domain.models.NullRequest ) returns ( domain.models.Consumes ) {}
+
+    rpc Subscribe ( domain.models.NullRequest ) returns ( domain.models.Consumes ) {}
 }

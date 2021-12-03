@@ -1,5 +1,9 @@
 export 'connect.dart';
+export 'connection_error.dart';
+export 'connection_restored.dart';
+export 'init_application.dart';
 export 'load_state.dart';
 export 'remove_item.dart';
 export 'set_item.dart';
+export 'set_loaded.dart';
 export 'set_response.dart';

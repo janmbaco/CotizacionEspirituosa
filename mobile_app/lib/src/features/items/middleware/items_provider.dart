@@ -5,5 +5,6 @@ import 'package:mobile_app/src/features/shared/middleware/base_provider.dart';
 
 class ItemsProvider extends BaseProvider<Items, Item> {
   ItemsProvider(ItemClient client)
-      : super(client.get(NullRequest()), client.set, client.remove);
+      : super("items", () => client.subscribe(NullRequest()), client.get,
+            client.set, client.remove);
 }

@@ -2,6 +2,8 @@ package products
 
 import pb "github.com/janmbaco/CotizacionEspirituosa/grpc_api/domain/models"
 
+const Selector = "products"
+
 func newState(state *pb.Products, products []*pb.Product, isModifying bool) *pb.Products {
 	mapProduct := make(map[uint32]*pb.Product, len(products))
 	for _, a := range products {

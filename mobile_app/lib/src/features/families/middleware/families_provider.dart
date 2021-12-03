@@ -5,5 +5,6 @@ import 'package:mobile_app/src/features/shared/middleware/base_provider.dart';
 
 class FamiliesProvider extends BaseProvider<Families, Family> {
   FamiliesProvider(FamilyClient client)
-      : super(client.get(NullRequest()), client.set, client.remove);
+      : super("families", () => client.subscribe(NullRequest()), client.get,
+            client.set, client.remove);
 }

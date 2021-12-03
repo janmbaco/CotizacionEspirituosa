@@ -2,9 +2,15 @@ package main
 
 import (
 	"flag"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/abstracts"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/deliveries"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/families"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/groups"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/items"
+	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/components/products"
 	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/global"
 	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/servers"
-	redux "github.com/janmbaco/go-redux/core"
+	redux "github.com/janmbaco/go-redux/src"
 	"os"
 
 	"github.com/janmbaco/CotizacionEspirituosa/grpc_api/app"
@@ -23,7 +29,7 @@ var eventsSubscriber *app.EventsSubscriber
 var store redux.Store
 
 func main() {
-	var file = flag.String("configs", os.Args[0]+".configs", "Config File")
+	var file = flag.String("configs", os.Args[0]+".config", "Config File")
 	flag.Parse()
 
 	config = global.NewConfig(
@@ -78,38 +84,45 @@ func setLogConfiguration() {
 
 func setStore() {
 
-	abstractsBO := redux.NewBusinessObjectBuilder(infrastructure.AbstractsInfrastructure.Entity, infrastructure.AbstractsInfrastructure.Actions.ActionsObject).
+	abstractsParam := redux.NewBusinessParamBuilder(infrastructure.AbstractsInfrastructure.Service.Get(), infrastructure.AbstractsInfrastructure.Actions).
+		SetSelector(abstracts.Selector).
 		SetActionsLogicByObject(infrastructure.AbstractsInfrastructure.Service).
-		GetBusinessObject()
+		GetBusinessParam()
 
-	deliveriesBO := redux.NewBusinessObjectBuilder(infrastructure.DeliveriesInfrastructure.Entity, infrastructure.DeliveriesInfrastructure.Actions.ActionsObject).
+	deliveriesParam := redux.NewBusinessParamBuilder(infrastructure.DeliveriesInfrastructure.Service.Get(), infrastructure.DeliveriesInfrastructure.Actions).
+		SetSelector(deliveries.Selector).
 		SetActionsLogicByObject(infrastructure.DeliveriesInfrastructure.Service).
-		GetBusinessObject()
+		GetBusinessParam()
 
-	familiesBO := redux.NewBusinessObjectBuilder(infrastructure.FamiliesInfrastructure.Entity, infrastructure.FamiliesInfrastructure.Actions.ActionsObject).
+	familiesParam := redux.NewBusinessParamBuilder(infrastructure.FamiliesInfrastructure.Service.Get(), infrastructure.FamiliesInfrastructure.Actions).
+		SetSelector(families.Selector).
 		SetActionsLogicByObject(infrastructure.FamiliesInfrastructure.Service).
-		GetBusinessObject()
+		GetBusinessParam()
 
-	groupsBO := redux.NewBusinessObjectBuilder(infrastructure.GroupsInfrastructure.Entity, infrastructure.GroupsInfrastructure.Actions.ActionsObject).
+	groupsParam := redux.NewBusinessParamBuilder(infrastructure.GroupsInfrastructure.Service.Get(), infrastructure.GroupsInfrastructure.Actions).
+		SetSelector(groups.Selector).
 		SetActionsLogicByObject(infrastructure.GroupsInfrastructure.Service).
-		GetBusinessObject()
+		GetBusinessParam()
 
-	itemsBO := redux.NewBusinessObjectBuilder(infrastructure.ItemsInfrastructure.Entity, infrastructure.ItemsInfrastructure.Actions.ActionsObject).
+	itemsParam := redux.NewBusinessParamBuilder(infrastructure.ItemsInfrastructure.Service.Get(), infrastructure.ItemsInfrastructure.Actions).
+		SetSelector(items.Selector).
 		SetActionsLogicByObject(infrastructure.ItemsInfrastructure.Service).
-		GetBusinessObject()
+		GetBusinessParam()
 
-	productsBO := redux.NewBusinessObjectBuilder(infrastructure.ProductsInfrastructure.Entity, infrastructure.ProductsInfrastructure.Actions.ActionsObject).
+	productsParam := redux.NewBusinessParamBuilder(infrastructure.ProductsInfrastructure.Service.Get(), infrastructure.ProductsInfrastructure.Actions).
+		SetSelector(products.Selector).
 		SetActionsLogicByObject(infrastructure.ProductsInfrastructure.Service).
-		GetBusinessObject()
+		GetBusinessParam()
 
-	store = redux.NewStore(abstractsBO, deliveriesBO, familiesBO, groupsBO, itemsBO, productsBO)
+	store = redux.NewStore(abstractsParam, deliveriesParam, familiesParam, groupsParam, itemsParam, productsParam)
 }
 
 func setGrpcServer(grpcServer *grpc.Server) {
-	ps.RegisterAbstractServer(grpcServer, servers.NewAbstractServer(store, infrastructure.AbstractsInfrastructure.Actions, infrastructure.AbstractsInfrastructure.Entity))
-	ps.RegisterDeliveryServer(grpcServer, servers.NewDeliveryServer(store, infrastructure.DeliveriesInfrastructure.Actions, infrastructure.DeliveriesInfrastructure.Entity))
-	ps.RegisterFamilyServer(grpcServer, servers.NewFamilyServer(store, infrastructure.FamiliesInfrastructure.Actions, infrastructure.FamiliesInfrastructure.Entity))
-	ps.RegisterGroupServer(grpcServer, servers.NewGroupServer(store, infrastructure.GroupsInfrastructure.Actions, infrastructure.GroupsInfrastructure.Entity))
-	ps.RegisterItemServer(grpcServer, servers.NewItemServer(store, infrastructure.ItemsInfrastructure.Actions, infrastructure.ItemsInfrastructure.Entity))
-	ps.RegisterProductServer(grpcServer, servers.NewProductServer(store, infrastructure.ProductsInfrastructure.Actions, infrastructure.ProductsInfrastructure.Entity))
+	ps.RegisterAbstractServer(grpcServer, servers.NewAbstractServer(store, infrastructure.AbstractsInfrastructure.Actions))
+	ps.RegisterDeliveryServer(grpcServer, servers.NewDeliveryServer(store, infrastructure.DeliveriesInfrastructure.Actions))
+	ps.RegisterFamilyServer(grpcServer, servers.NewFamilyServer(store, infrastructure.FamiliesInfrastructure.Actions))
+	ps.RegisterGroupServer(grpcServer, servers.NewGroupServer(store, infrastructure.GroupsInfrastructure.Actions))
+	ps.RegisterItemServer(grpcServer, servers.NewItemServer(store, infrastructure.ItemsInfrastructure.Actions))
+	ps.RegisterProductServer(grpcServer, servers.NewProductServer(store, infrastructure.ProductsInfrastructure.Actions))
+	ps.RegisterStatusServer(grpcServer, &servers.StatusService{})
 }

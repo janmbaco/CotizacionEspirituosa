@@ -12,8 +12,10 @@ service Family{
 
     rpc Set( domain.models.Family )  returns ( domain.models.ResultResponse ) {}
 
-    rpc Get( domain.models.NullRequest )  returns ( stream domain.models.Families ) {}
+    rpc Get( domain.models.NullRequest )  returns ( domain.models.Families ) {}
 
     rpc Remove( domain.models.Family )  returns ( domain.models.ResultResponse  ) {}
+
+    rpc Subscribe( domain.models.NullRequest )  returns ( stream domain.models.Families ) {}
     
 }

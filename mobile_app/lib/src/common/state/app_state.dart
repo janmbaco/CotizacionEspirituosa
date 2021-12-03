@@ -3,7 +3,7 @@ import 'package:mobile_app/src/common/state/pb.models.dart' as pb;
 
 @immutable
 class AppState {
-  final bool isLoading;
+  final bool isLoaded;
   final pb.Abstracts abstracts;
   final pb.Deliveries deliveries;
   final pb.Families families;
@@ -11,16 +11,17 @@ class AppState {
   final pb.Items items;
   final pb.Products products;
   final pb.ResultResponse serverResponse;
+  final bool isErrorConnection;
 
-  AppState(
-      {this.isLoading = false,
-      this.abstracts,
-      this.deliveries,
-      this.families,
-      this.groups,
-      this.items,
-      this.products,
-      this.serverResponse});
-
-  factory AppState.loading() => AppState(isLoading: true);
+  AppState({
+    this.isLoaded = false,
+    this.abstracts,
+    this.deliveries,
+    this.families,
+    this.groups,
+    this.items,
+    this.products,
+    this.serverResponse,
+    this.isErrorConnection = false,
+  });
 }

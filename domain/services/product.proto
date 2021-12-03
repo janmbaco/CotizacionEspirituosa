@@ -12,8 +12,10 @@ service Product{
 
     rpc Set( domain.models.Product )  returns ( domain.models.ResultResponse ) {}
 
-    rpc Get( domain.models.NullRequest )  returns ( stream domain.models.Products ) {}
+    rpc Get( domain.models.NullRequest )  returns ( domain.models.Products ) {}
 
     rpc Remove( domain.models.Product )  returns ( domain.models.ResultResponse  ) {}
+
+    rpc Subscribe( domain.models.NullRequest )  returns ( stream domain.models.Products ) {}
     
 }

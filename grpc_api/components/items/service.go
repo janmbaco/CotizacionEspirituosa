@@ -28,12 +28,11 @@ func (this *service) Get() *pb.Items {
 
 func (this *service) Set(state *pb.Items, item *pb.Item) *pb.Items {
 	if item.Id == 0 {
-		item = this.repository.Insert(item)
-		state.Items = append(state.Items, item)
+		this.repository.Insert(item)
 	} else {
-		state = newState(state, this.repository.Update(&pb.Item{Id: item.Id}, item), true)
+		this.repository.Update(&pb.Item{Id: item.Id}, item)
 	}
-	return state
+	return this.Get()
 }
 
 func (this *service) Remove(state *pb.Items, item *pb.Item) *pb.Items {
@@ -41,15 +40,16 @@ func (this *service) Remove(state *pb.Items, item *pb.Item) *pb.Items {
 		panic("This item not exists in the repository!")
 	}
 
-	return newState(state, this.repository.Delete(&pb.Item{Id: item.Id}), false)
+	this.repository.Delete(&pb.Item{Id: item.Id})
+	return this.Get()
 }
 
 func (this *service) RemoveByProduct(state *pb.Items, product *pb.Product) *pb.Items {
 	if product.Id == 0 {
 		panic("This product not exists in the repository!")
 	}
-
-	return newState(state, this.repository.Delete(&pb.Item{ProductId: product.Id}), false)
+	this.repository.Delete(&pb.Item{ProductId: product.Id})
+	return this.Get()
 }
 
 func (this *service) RemoveByDelivery(state *pb.Items, delivery *pb.Delivery) *pb.Items {
@@ -57,5 +57,6 @@ func (this *service) RemoveByDelivery(state *pb.Items, delivery *pb.Delivery) *p
 		panic("This product not exists in the repository!")
 	}
 
-	return newState(state, this.repository.Delete(&pb.Item{DeliveryId: delivery.Id}), false)
+	this.repository.Delete(&pb.Item{DeliveryId: delivery.Id})
+	return this.Get()
 }

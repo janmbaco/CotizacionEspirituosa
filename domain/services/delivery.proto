@@ -12,7 +12,9 @@ service Delivery {
 
     rpc Set ( domain.models.Delivery )  returns ( domain.models.ResultResponse ) {}
 
-    rpc Get ( domain.models.NullRequest )  returns ( stream domain.models.Deliveries ) {}
+    rpc Get ( domain.models.NullRequest )  returns ( domain.models.Deliveries ) {}
 
     rpc Remove( domain.models.Delivery )  returns ( domain.models.ResultResponse  ) {}
+
+    rpc Subscribe ( domain.models.NullRequest )  returns ( stream domain.models.Deliveries ) {}
 }

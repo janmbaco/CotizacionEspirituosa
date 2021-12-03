@@ -1,7 +1,7 @@
 package servers
 
 import (
-	redux "github.com/janmbaco/go-redux/core"
+	redux "github.com/janmbaco/go-redux/src"
 	"google.golang.org/grpc"
 )
 
@@ -11,25 +11,28 @@ type StateSender interface {
 
 type stateSender struct {
 	store   redux.Store
-	entity  redux.StateEntity
+	selector string
 	stream  grpc.ServerStream
 	channel chan interface{}
+	receiver func(interface{})
 }
 
-func NewStateSender(store redux.Store, entity redux.StateEntity, stream grpc.ServerStream) *stateSender {
-	return &stateSender{store: store, entity: entity, stream: stream, channel: make(chan interface{}, 1)}
+func NewStateSender(store redux.Store, selector string, stream grpc.ServerStream) *stateSender {
+	stateSender := &stateSender{store: store, selector: selector, stream: stream, channel: make(chan interface{}, 1)}
+	stateSender.receiver = func(state interface{}) {
+		stateSender.channel <- state
+	}
+	return stateSender
 }
 
 func (this *stateSender) Initialize() {
-	this.store.Subscribe(this.entity, this.receiver)
+	this.store.SubscribeTo(this.selector, &this.receiver)
 	for {
+		
 		if this.stream.SendMsg(<-this.channel) != nil {
-			this.store.UnSubscribe(this.entity, this.receiver)
+			this.store.UnSubscribeFrom(this.selector, &this.receiver)
 			break
 		}
 	}
 }
 
-func (this *stateSender) receiver(state interface{}) {
-	this.channel <- state
-}

@@ -7,44 +7,39 @@ import (
 	"reflect"
 )
 
-type FnGetIds func(dataArray interface{}) []int64
-
 type DataAccess interface {
-	Insert(datarow interface{}) interface{}
+	Insert(datarow interface{})
 	Select(datafilter interface{}) interface{}
-	Update(datafilter interface{}, datarow interface{}) interface{}
-	Delete(datafilter interface{}) interface{}
+	Update(datafilter interface{}, datarow interface{})
+	Delete(datafilter interface{})
 }
 
 type dataAccess struct {
 	db         *gorm.DB
 	datamodel  interface{}
 	modelType  reflect.Type
-	filterType reflect.Type
-	GetIds     FnGetIds
 }
 
-func NewDataAccess(db *gorm.DB, modelType reflect.Type, filterType reflect.Type, getIds FnGetIds) DataAccess {
-	result := &dataAccess{db: db, datamodel: reflect.New(modelType.Elem()).Interface(), modelType: modelType, filterType: filterType, GetIds: getIds}
+func NewDataAccess(db *gorm.DB, modelType reflect.Type) DataAccess {
+	result := &dataAccess{db: db, datamodel: reflect.New(modelType.Elem()).Interface(), modelType: modelType}
 	_ = result.db.AutoMigrate(result.datamodel)
 	return result
 }
 
-func (r *dataAccess) Insert(datarow interface{}) interface{} {
+func (r *dataAccess) Insert(datarow interface{})  {
 	errorhandler.CheckNilParameter(map[string]interface{}{"datarow": datarow})
 
 	if reflect.TypeOf(datarow) != r.modelType {
 		panic("The datarow does not belong to this datamodel!")
 	}
 
-	r.db.Model(r.datamodel).Create(datarow)
-	return datarow
+	errorhandler.TryPanic(r.db.Model(r.datamodel).Create(datarow).Error)
 }
 
 func (r *dataAccess) Select(datafilter interface{}) interface{} {
 	errorhandler.CheckNilParameter(map[string]interface{}{"datafilter": datafilter})
 
-	if reflect.TypeOf(datafilter) != r.filterType {
+	if reflect.TypeOf(datafilter) != r.modelType {
 		panic("The datafilter does not belong to this dataAccess!")
 	}
 	slice := reflect.MakeSlice(reflect.SliceOf(r.modelType), 0, 0)
@@ -58,17 +53,13 @@ func (r *dataAccess) Select(datafilter interface{}) interface{} {
 	return reflect.ValueOf(dataArray).Elem().Interface()
 }
 
-func (r *dataAccess) Update(datafilter interface{}, datarow interface{}) interface{} {
+func (r *dataAccess) Update(datafilter interface{}, datarow interface{}) {
 	errorhandler.CheckNilParameter(map[string]interface{}{"datafilter": datafilter, "datarow": datarow})
+	errorhandler.TryPanic(r.db.Model(r.datamodel).Where(datafilter).Updates(datarow).Error)
 
-	r.db.Model(r.datamodel).Where(datafilter).Updates(datarow)
-	return r.Select(datafilter)
 }
 
-func (r *dataAccess) Delete(datafilter interface{}) interface{} {
+func (r *dataAccess) Delete(datafilter interface{})  {
 	errorhandler.CheckNilParameter(map[string]interface{}{"datafilter": datafilter})
-
-	dataArray := r.Select(datafilter)
-	r.db.Model(r.datamodel).Delete(datafilter, r.GetIds(dataArray))
-	return dataArray
+	errorhandler.TryPanic(r.db.Model(r.datamodel).Delete(datafilter).Error)
 }

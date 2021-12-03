@@ -5,5 +5,6 @@ import 'package:mobile_app/src/features/shared/middleware/base_provider.dart';
 
 class AbstractsProvider extends BaseProvider<Abstracts, Abstract> {
   AbstractsProvider(AbstractClient client)
-      : super(client.get(NullRequest()), client.set, client.remove);
+      : super("abstracts", () => client.subscribe(NullRequest()), client.get,
+            client.set, client.remove);
 }

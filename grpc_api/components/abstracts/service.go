@@ -27,13 +27,11 @@ func (this *service) Get() *pb.Abstracts {
 
 func (this *service) Set(state *pb.Abstracts, abstract *pb.Abstract) *pb.Abstracts {
 	if abstract.Id == 0 {
-		abstract = this.repository.Insert(abstract)
-		state.Abstracts = append(state.Abstracts, abstract)
+		this.repository.Insert(abstract)
 	} else {
-		state = newState(state, this.repository.Update(&pb.Abstract{Id: abstract.Id}, abstract), true)
+		this.repository.Update(&pb.Abstract{Id: abstract.Id}, abstract)
 	}
-
-	return state
+	return this.Get()
 }
 
 func (this *service) Remove(state *pb.Abstracts, abstract *pb.Abstract) *pb.Abstracts {
@@ -44,7 +42,7 @@ func (this *service) Remove(state *pb.Abstracts, abstract *pb.Abstract) *pb.Abst
 	if cancel := this.events.RemovingAbstract(abstract); cancel {
 		panic("Deletion was canceled through an event!")
 	}
-
-	return newState(state, this.repository.Delete(&pb.Abstract{Id: abstract.Id}), false)
+	this.repository.Delete(&pb.Abstract{Id: abstract.Id})
+	return this.Get()
 
 }

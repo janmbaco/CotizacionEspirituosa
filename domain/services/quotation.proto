@@ -11,8 +11,11 @@ import "domain/models/response.proto";
 service Quotation {
 
     rpc PinUpQoutation ( domain.models.PinUpRequest ) returns ( domain.models.ResultResponse ) {}
+    
     rpc UnPinUpQoutation ( domain.models.UnPinUpRequest ) returns ( domain.models.ResultResponse ) {}
 
-    rpc Get ( domain.models.NullRequest ) returns ( stream domain.models.Quotations ) {}
+    rpc Get ( domain.models.NullRequest ) returns ( domain.models.Quotations ) {}
+
+    rpc Subscribe ( domain.models.NullRequest ) returns ( domain.models.Quotations ) {}
 
 }

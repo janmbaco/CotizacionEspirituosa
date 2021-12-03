@@ -24,7 +24,7 @@ func NewEvents(publisher events2.Publisher) Events {
 }
 
 func (e *events) OnRemovingSubscribe(fn func(group *pb.Group) bool) {
-	e.publisher.Subscribe(groupEvents, func() {
+	onRemoving := func() {
 		if !e.cancel {
 			errorhandler.TryCatchError(func() {
 				e.cancel = fn(e.group)
@@ -32,7 +32,8 @@ func (e *events) OnRemovingSubscribe(fn func(group *pb.Group) bool) {
 				e.cancel = true
 			})
 		}
-	})
+	}
+	e.publisher.Subscribe(groupEvents, &onRemoving)
 }
 
 func (e *events) RemovingGroup(group *pb.Group) bool {

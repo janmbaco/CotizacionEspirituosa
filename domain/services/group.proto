@@ -12,7 +12,9 @@ service Group {
 
     rpc Set ( domain.models.Group )  returns ( domain.models.ResultResponse ) {}
 
-    rpc Get( domain.models.NullRequest )  returns ( stream domain.models.Groups ) {}
+    rpc Get( domain.models.NullRequest )  returns ( domain.models.Groups ) {}
 
     rpc Remove( domain.models.Group )  returns ( domain.models.ResultResponse  ) {}
+
+    rpc Subscribe( domain.models.NullRequest )  returns ( stream domain.models.Groups ) {}
 }

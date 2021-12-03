@@ -28,13 +28,12 @@ func (this *service) Get() *pb.Groups {
 
 func (this *service) Set(state *pb.Groups, group *pb.Group) *pb.Groups {
 	if group.Id == 0 {
-		group = this.repository.Insert(group)
-		state.Groups = append(state.Groups, group)
+		this.repository.Insert(group)
 	} else {
-		state = newState(state, this.repository.Update(&pb.Group{Id: group.Id}, group), true)
+		this.repository.Update(&pb.Group{Id: group.Id}, group)
 	}
 
-	return state
+	return this.Get()
 }
 
 func (this *service) Remove(state *pb.Groups, group *pb.Group) *pb.Groups {
@@ -46,7 +45,8 @@ func (this *service) Remove(state *pb.Groups, group *pb.Group) *pb.Groups {
 		panic("Deletion was canceled through an event!")
 	}
 
-	return newState(state, this.repository.Delete(&pb.Group{Id: group.Id}), false)
+	this.repository.Delete(&pb.Group{Id: group.Id})
+	return this.Get()
 }
 func (this *service) RemoveByAbstract(state *pb.Groups, abstract *pb.Abstract) *pb.Groups {
 	if abstract.Id == 0 {
@@ -54,11 +54,14 @@ func (this *service) RemoveByAbstract(state *pb.Groups, abstract *pb.Abstract) *
 	}
 
 	filter := &pb.Group{AbstractId: abstract.Id}
-	for _, group := range this.repository.Select(filter) {
-		if cancel := this.events.RemovingGroup(group); cancel {
-			panic("Deletion was canceled through an event!")
+	groupsToDelete := this.repository.Select(filter)
+	if len(groupsToDelete) > 0 {
+		for _, group := range groupsToDelete  {
+			if cancel := this.events.RemovingGroup(group); cancel {
+				panic("Deletion was canceled through an event!")
+			}
 		}
+		this.repository.Delete(filter)
 	}
-
-	return newState(state, this.repository.Delete(filter), false)
+	return this.Get()
 }

@@ -24,7 +24,7 @@ func NewEvents(publisher events2.Publisher) Events {
 }
 
 func (e *events) OnRemovingSubscribe(fn func(abstract *pb.Abstract) bool) {
-	e.publisher.Subscribe(abstractEvents, func() {
+	onRemoving := func() {
 		if !e.cancel {
 			errorhandler.TryCatchError(func() {
 				e.cancel = fn(e.abstract)
@@ -32,7 +32,8 @@ func (e *events) OnRemovingSubscribe(fn func(abstract *pb.Abstract) bool) {
 				e.cancel = true
 			})
 		}
-	})
+	}
+	e.publisher.Subscribe(abstractEvents, &onRemoving)
 }
 
 func (e *events) RemovingAbstract(abstract *pb.Abstract) bool {

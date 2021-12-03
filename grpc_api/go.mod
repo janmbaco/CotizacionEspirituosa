@@ -4,10 +4,9 @@ go 1.14
 
 require (
 	github.com/golang/protobuf v1.4.3
-	github.com/google/wire v0.4.0
-	github.com/janmbaco/copier v0.0.0
-	github.com/janmbaco/go-infrastructure v0.0.8
-	github.com/janmbaco/go-redux v0.0.15
+	github.com/google/wire v0.5.0
+	github.com/janmbaco/go-infrastructure v0.0.11
+	github.com/janmbaco/go-redux v0.0.22
 	github.com/jinzhu/copier v0.1.0 // indirect
 	github.com/jnewmano/grpc-json-proxy v0.0.2
 	golang.org/x/net v0.0.0-20201031054903-ff519b6c9102 // indirect
